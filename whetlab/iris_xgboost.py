@@ -22,22 +22,25 @@ perm = permutation(np.arange(X.shape[0]))
 X = X[perm]
 y = y[perm]
 
-Xt = X[:40]
-yt = y[:40]
-X = X[40:]
-y = y[40:]
+prop = 60
+
+Xt = X[:prop]
+yt = y[:prop]
+X = X[prop:]
+y = y[prop:]
 
 dtrain = xgb.DMatrix(X, label=y)
 dtest = xgb.DMatrix(Xt, label=yt)
 watchlist = [(dtrain, 'train'), (dtest, 'test')]
 
-param={'max_depth': 10, 'eta': 0.031, 'objective': 'multi:softmax',
-       'num_class': 3,'eval_metric': 'merror'}
+param={'max_depth': 3, 'eta': 0.006, 'objective': 'multi:softmax',
+       'num_class': 3,'eval_metric': 'merror', 'subsample': 0.5}
 
 sys.stderr.write(str(param) + "\n")    
 
-bst = xgb.train(param, dtrain, 50, watchlist )
+bst = xgb.train(param, dtrain, 10, watchlist )
 
 sys.stderr.write(str(confusion_matrix(yt, bst.predict(dtest))) + "\n")
-    
+sys.stderr.write(str(confusion_matrix(y, bst.predict(dtrain))) + "\n")
+
  
