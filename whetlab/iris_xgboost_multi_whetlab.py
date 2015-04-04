@@ -24,7 +24,7 @@ y = y[perm]
 dtrain = xgb.DMatrix(X, label=y)
 
 param_grid = \
-    	{'max_depth' : {'min': 2, 'max': 10, 'type': 'integer'},
+    	{'max_depth' : {'min': 1, 'max': 20, 'type': 'integer'},
       'subsample' : {'min': 0.3, 'max': 1.0, 'type': 'float'},
       'eta' : {'min': log(0.01), 'max': log(1), 'type': 'float'},
       'num_round': {'min': 10, 'max': 150, 'type': 'integer'}}
@@ -34,7 +34,7 @@ scientist = whetlab.Experiment(name = "Iris - xgboost-multi - 20150404",
                                parameters = param_grid,
                                outcome = {"name" : "accuracy"})
 
-n_iter = 20
+n_iter = 40
 
 p = re.compile("[a-z-]*:(0\.[0-9]*)")
 
@@ -49,7 +49,7 @@ for i in range(n_iter):
     
     sys.stderr.write(str(param) + "\n")    
     
-    result = xgb.cv(param, dtrain, num_round, nfold=3,
+    result = xgb.cv(param, dtrain, num_round, nfold=6,
                       metrics={'merror'}, seed=1234)
     acc = 1-float(p.match(result[-1][7:]).group(1))
     
