@@ -20,7 +20,6 @@ y = data.target
 perm = permutation(np.arange(X.shape[0]))
 X = X[perm]
 y = y[perm]
-y = (y==1)*1
 
 dtrain = xgb.DMatrix(X, label=y)
 
@@ -54,7 +53,7 @@ for i in range(n_iter):
                       metrics={'merror'}, seed=1234)
     acc = 1-float(p.match(result[-1][7:]).group(1))
     
-    sys.stderr.write("--> %.4f\n" % acc)
+    sys.stderr.write("%s --> %.4f\n" % (str(param), acc))
 
     scientist.update(job, acc)
     
