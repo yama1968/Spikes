@@ -27,7 +27,8 @@ dtrain = xgb.DMatrix(X, label=y)
 param_grid = \
     	{'max_depth' : {'min': 2, 'max': 10, 'type': 'integer'},
       'subsample' : {'min': 0.3, 'max': 1.0, 'type': 'float'},
-      'eta' : {'min': log(0.1), 'max': log(1), 'type': 'float'}}
+      'eta' : {'min': log(0.1), 'max': log(1), 'type': 'float'},
+      'num_round': {'min': 20, 'max': 150, 'type': 'integer'}}
 
 scientist = whetlab.Experiment(name = "Iris - xgboost - 20150404",
                                description = "",
@@ -48,6 +49,9 @@ for i in range(n_iter):
 
     param.update(job)
     param['eta'] = exp(param['eta'])
+    num_round = param['num_round']    
+    del param['num_round']
+
     result = xgb.cv(param, dtrain, num_round, nfold=3,
                       metrics={'auc'}, seed = 0)
     auc = float(p.match(result[-1][7:]).group(1))
