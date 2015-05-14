@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-import whetlab
-from math import log, exp
+
 import sys
-import re
 from sklearn.datasets import load_iris
 import numpy as np
 from numpy.random import permutation
