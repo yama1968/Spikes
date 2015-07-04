@@ -1,0 +1,1 @@
+{"description": "Does the \"hot hand\" phenomenon exist in the NBA? Find out using IPCluster to do MCMC Bayesian Estimation!", "notebooks": ["hothand_parallel.ipynb"], "envfile": "metadata/share-0086b981a2daaf58c4b30dd2983ca8587e36514f-0.tar.bz2", "public": true, "name": "ipcluster_mcmc"}
