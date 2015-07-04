@@ -1,7 +1,7 @@
 
 setwd("/home2/yannick2/github/Spikes/rjags")
 
-N <- 50000
+N <- 51258/960000
 x <- 1:N
 epsilon <- rnorm(N, 0, 1)
 y <- x + epsilon
