@@ -1,4 +1,5 @@
 import numpy as np
+import pymc as pm
 
 (nb_stateux, sample_length) = sample.shape
 
