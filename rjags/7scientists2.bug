@@ -1,0 +1,12 @@
+# bugs model for seven scientists
+
+model{
+        for (i in 1:n) {
+                x[i] ~ dnorm(mu, lambda[i])
+        }
+        mu ~ dnorm(0,.001)
+        for (i in 1:n) {
+                sigma[i] ~ dunif(0,10)
+                lambda[i] <- 1 / (sigma[i] * sigma[i])
+        }
+}

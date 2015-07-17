@@ -1,0 +1,15 @@
+data {
+        yT <- 8
+        nT <- 10
+        n <- dim(sP)
+}
+model {
+        yT ~ dbin(pT, nT)
+        pT ~ dunif(0, 1)
+        for (i in 1:n) {
+                sP[i] ~ dexp(theta)
+        }
+        theta ~ dgamma(0.001, 0.001)
+        surv.t <- pT/theta
+        Is <- surv.t - 2
+}

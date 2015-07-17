@@ -1,10 +1,10 @@
 
 setwd("/home2/yannick2/github/Spikes/rjags")
 
-N <- 51258/960000
+N <- 2000
 x <- 1:N
 epsilon <- rnorm(N, 0, 1)
-y <- x + epsilon
+y <- 2 * x + 1 + epsilon
 
 # 
 # write.table(data.frame(X = x, Y = y, Epsilon = epsilon),

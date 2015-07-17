@@ -1,0 +1,11 @@
+
+# Cha So-soon
+
+model {
+        for (i in 1:nattempts) {
+                z.low[i] <- 15 * equals(y[i], 1) + 0 * equals(y[i], 0)
+                z.high[i] <- 25 * equals(y[i], 1) + n * equals(y[i], 0)
+                z[i] ~ dbin(theta, n) T(z.low[i], z.high[i])
+        }
+        theta ~ dbeta(1,1) T(0.25, 1.)
+}

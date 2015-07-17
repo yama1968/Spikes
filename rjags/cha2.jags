@@ -1,0 +1,21 @@
+
+# Cha So-soon
+
+data {
+        for (i in 1:nattempts) {
+                is.censored[i] <- 1
+        }
+        is.cnsrd <- 1
+}
+
+model {
+        for (i in 1:(nattempts-1)) {
+                z[i] ~ dbin(theta, n)
+                lim[i, 1] <- 15
+                lim[i, 2] <- 25
+                is.censored[i] ~ dinterval(z[i], lim[i,])
+        }
+        z[nattempts] ~ dbin(theta, n)
+        #theta ~ dbeta(1,1)
+        theta ~ dunif(0.25, 1)
+}
