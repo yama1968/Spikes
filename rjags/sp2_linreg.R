@@ -1,9 +1,8 @@
 
-setwd("/home2/yannick2/github/Spikes/rjags")
 
 N <- 2000
 x <- 1:N
-epsilon <- rnorm(N, 0, 1)
+epsilon <- rnorm(N, 0, 10)
 y <- 2 * x + 1 + epsilon
 
 # 
@@ -29,4 +28,4 @@ system.time( { samples <- coda.samples(jags,
                                        5000)
 } )
 
-plot(samples)
+summary(samples)
