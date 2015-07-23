@@ -6,7 +6,7 @@ model{
         }
         mu ~ dnorm(0,.001)
         for (i in 1:n) {
-                sigma[i] ~ dunif(0,10)
+                sigma[i] ~ dunif(0,20)
                 lambda[i] <- 1 / (sigma[i] * sigma[i])
         }
 }
