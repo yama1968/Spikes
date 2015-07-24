@@ -15,7 +15,7 @@ cluster <- makeCluster(spec = nodes,
                        type = "SOCK")
 
 # cluster <- makeCluster(spec = nodes,
-#                        type = "MPI")
+#                         type = "MPI")
 
 m <- jags.parfit(cl = cluster,
                  model = '7scientists2.bug',
