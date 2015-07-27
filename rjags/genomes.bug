@@ -1,0 +1,22 @@
+data {
+        KAA <- sum(NAA)
+        KAB <- sum(NAB)
+        KBB <- sum(NBB)
+}
+
+model {
+        NAA[1:3] ~ dmulti(XAA[1:3], KAA)
+        NAB[1:3] ~ dmulti(XAB[1:3], KAB)
+        NBB[1:3] ~ dmulti(XBB[1:3], KBB)
+        XAA[1] <- (1 - sigma)*p + sigma
+        XAA[2] <- (1 - sigma)*q
+        XAA[3] <- 0
+        XAB[1] <- (1 - sigma)*p/2 + sigma/4
+        XAB[2] <- 0.5
+        XAB[3] <- (1 - sigma)*q/2 + sigma/4
+        XBB[1] <- 0 XBB[2] <- (1 - sigma)*p
+        XBB[3] <- (1 - sigma)*q + sigma
+        p ~ dunif(0, 1)
+        sigma ~ dunif(0, 1)
+        q <- 1 - p 
+}

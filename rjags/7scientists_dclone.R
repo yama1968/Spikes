@@ -8,7 +8,7 @@ n <- length(x)
 m <- NA
 cluster <- NA
 
-chains <- 32
+chains <- 4
 nodes <- 4
 
 cluster <- makeCluster(spec = nodes,
@@ -22,9 +22,9 @@ system.time (m <- jags.parfit(cl = cluster,
                  data = list('x' = x,
                              'n' = n),
                  n.chains = chains,
-                 n.adapt = 1000,
+                 n.adapt = 4000,
                  params = c("mu", "sigma"),
-                 n.iter = 100000))
+                 n.iter = 10000))
 
 summary(m)
 
