@@ -1,0 +1,40 @@
+
+data {
+        for (i in 1:N) {
+                u[i] <- z[i]
+                v[i] <- z[i]
+        }
+        k <- 2
+}
+model {
+        for (i in 1:N) {
+                y[i] ~ dnorm(a1 + b1 * (x[i] - mean(x)), tau1)
+                z[i] ~ dnorm(a2 + b2 * (x[i] - mean(x)), tau2)
+                u[i] ~ dt(a3 + b3 * (x[i] - mean(x)), tau3, k)
+                outlier[i] ~ dbern(p)
+                v[i] ~ dnorm(a4 + b4 * (x[i] - mean(x)), 
+                        tau4 * outlier[i] + tau5 * (1-outlier[i]))
+        }
+        a1 ~ dnorm(0, 1/1000000)
+        b1 ~ dnorm(0, 1/1000000)
+        tau1 <- pow(sigma1, -2)
+        sigma1 ~ dunif(0, 1000000)
+        
+        a2 ~ dnorm(0, 1/1000000)
+        b2 ~ dnorm(0, 1/1000000)
+        tau2 <- pow(sigma2, -2)
+        sigma2 ~ dunif(0, 1000000)
+        
+        a3 ~ dnorm(0, 1/1000000)
+        b3 ~ dnorm(0, 1/1000000)
+        tau3 <- pow(sigma3, -2)
+        sigma3 ~ dunif(0, 1000000)
+        
+        a4 ~ dnorm(0, 1/1000000)
+        b4 ~ dnorm(0, 1/1000000)
+        tau4 <- pow(sigma4, -2)
+        sigma4 ~ dunif(0, 1000000)
+        p ~ dunif(0, 1)
+        tau5 <- pow(sigma5, -2)
+        sigma5 ~ dunif(0, 1000000)
+}
