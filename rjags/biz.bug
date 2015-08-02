@@ -1,0 +1,14 @@
+data {
+        N <- length(biz2)
+        p <- N / (N + zeros)
+}
+
+model {
+        for (i in 1:N) {
+                 biz2[i] ~ dgamma(a, b)
+        }
+        
+        p ~ dunif(0,1)
+        a ~ dunif(0,100)
+        b ~ dunif(0,100)
+}

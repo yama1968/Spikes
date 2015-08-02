@@ -1,0 +1,18 @@
+data {
+        N2 <- length(biz2)
+        N <- N2 + zero
+}
+
+model {
+        for (i in 1:N2) {
+                 biz2[i] ~ dgamma(a, b)
+                 biz2.rep[i] ~ dgamma(a,b)
+        }
+        
+        zero ~ dbin(p, N)
+        p ~ dunif(0,1)
+        a ~ dunif(0,100)
+        b ~ dunif(0,100)
+        
+        m <- mean(biz2.rep) * p
+}

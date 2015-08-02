@@ -1,0 +1,40 @@
+
+data {
+        for (i in 1:N) {
+                u[i] <- z[i]
+                v[i] <- z[i]
+        }
+        k <- 2
+        pp[1] <- 1
+        pp[2] <- 2
+}
+model {
+        for (i in 1:N) {
+                y[i] ~ dnorm(a1 + b1 * (x[i] - mean(x)), tau1)
+                u[i] ~ dt(a2 + b2 * (x[i] - mean(x)), tau2, k)
+                
+                mu[i] <- a3 + b3 * (x[i] - mean(x))
+                clust[i] ~ dcat(pClust)
+                v[i] ~ dnorm(mu[i], tau[clust[i]])
+        }
+        
+        pClust ~ ddirch(pp)
+        
+        a1 ~ dnorm(0, 1/1000000)
+        b1 ~ dnorm(0, 1/1000000)
+        tau1 <- pow(sigma1, -2)
+        sigma1 ~ dunif(0, 1000000)
+        
+        a2 ~ dnorm(0, 1/1000000)
+        b2 ~ dnorm(0, 1/1000000)
+        tau2 <- pow(sigma2, -2)
+        sigma2 ~ dunif(0, 1000000)
+        
+        a3 ~ dnorm(0, 1/1000000)
+        b3 ~ dnorm(0, 1/1000000)
+
+        for (i in 1:2) {
+                tau[i] ~ dgamma(0.01, 0.01)
+                sigma[i] <- sqrt(1/tau[i])
+        }
+}
