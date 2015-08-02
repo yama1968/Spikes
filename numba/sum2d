@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Feb  1 16:16:34 2015
+
+@author: cc
+"""
+
+from numba import jit
+from numpy import arange
+
+# jit decorator tells Numba to compile this function.
+# The argument types will be inferred by Numba when function is called.
+@jit
+def sum2d(arr):
+    M, N = arr.shape
+    result = 0.0
+    for i in range(M):
+        for j in range(N):
+            result += arr[i,j]
+    return result
+
+a = arange(9).reshape(3,3)
+%timeit _ = (sum2d(a))
+
