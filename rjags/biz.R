@@ -13,7 +13,7 @@ m <- NA
 cluster <- NA
 
 chains <- 4
-nodes <- 4
+nodes <- 2
 
 cluster <- makeCluster(spec = nodes,
                        type = "SOCK")

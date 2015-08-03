@@ -14,5 +14,5 @@ model {
         a ~ dunif(0,100)
         b ~ dunif(0,100)
         
-        m <- mean(biz2.rep) * p
+        m <- mean(biz2.rep) * (1-p)
 }
