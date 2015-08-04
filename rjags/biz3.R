@@ -18,9 +18,9 @@ biz <- c(rep(0,11),
          68.5,
          0,
          50,
-         0,0,0,
-         132,
-         0, 40)
+         0,0,
+         241,
+         0, 50,0,0,0,0)
 
 
 # model
@@ -50,7 +50,7 @@ runbiz <- function (biz,
                                       data = list('biz2' = biz2, 'zero' = zero),
                                       n.chains = chains,
                                       n.adapt = 1000,
-                                      params = c('p', 'a', 'b', 'm'),
+                                      params = c('p', 'm'),
                                       n.iter = 20000))
         stopCluster(cluster)
                 
