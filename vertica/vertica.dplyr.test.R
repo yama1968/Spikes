@@ -30,4 +30,19 @@ barplot(airport_delays[["delay"]],horiz=TRUE,
         names.arg=airport_delays[["origin"]],
         xlab="Average delay in minutes",ylab="Airport")
 
+delays <- flights_vertica %>%
+  select(month, day, arr_delay) %>%
+  filter(!is.na(arr_delay)) %>%
+  group_by(month, day) %>%
+  summarise(avg_delay = mean(arr_delay)) %>%
+  mutate(delay_smoothed = mean(avg_delay, 
+                               range=c(-5,5), 
+                               partition=NULL, 
+                               order=c(month, day)))
+
+delays_local <- collect(delays)
+plot(delays_local[["delay_smoothed"]],xlab="Day of Year",
+     ylab="Average delay 5 days prior and after (minutes)")
+lines(delays_local[["delay_smoothed"]])
+grid(nx=5)
 
