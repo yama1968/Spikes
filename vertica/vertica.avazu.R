@@ -108,6 +108,8 @@ system.time({
     arrange(hod)
   per.hour <- collect(v.per.hour)
 })
+# écoulé: 6 sec
+
 
 system.time({
   v.per.day.hour <- v.hod %>%
