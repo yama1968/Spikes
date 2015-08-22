@@ -1,0 +1,1 @@
+copy test.train2 ("id", "click", "hour", "c1", "banner_pos", "site_id", "site_domain", "site_category", "app_id", "app_domain", "app_category", "device_id", "device_ip", "device_model", "device_type", "device_conn_type", "c14", "c15", "c16", "c17", "c18", "c19", "c20", "c21") from '/mnt/tmp/train.csv' with header=true;

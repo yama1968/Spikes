@@ -1,3 +1,12 @@
+
+# Yannick Martel 08/2015
+# all timings for a VirtualBox Mint 17.2LTS VM, with 2 CPUs and 4GB RAM / 4GB swap
+# on an i5 lenovo laptop
+# with Vertica and R installed, ran from rstudio
+# train.csv: 40M lines, 1.1GB gz, 5.9GB uncompressed 
+# (barely fits on R /data.table with a 16GB RAM desktop)
+# 2.4GB files with Vertica!!!
+
 require(vertica.dplyr)
 require(data.table)
 
@@ -26,6 +35,7 @@ system.time({
 # full
 # utilisateur     système      écoulé 
 # 7.739      39.923     501.373 
+#       4.815      39.301     456.083 ->  8 min (cold)
 
 v.train <- tbl(v, "train")
 
@@ -68,6 +78,13 @@ plot(per.device_ip$nb[1:50], type='l')
 hist(per.device_ip[1:1000]$p)
 
 system.time({
+  per.device_ip.100 <- collect(v.per.device_ip %>% filter(row_number() <=100))
+})
+# utilisateur     système      écoulé 
+# 0.000       0.000      63.793 
+
+
+system.time({
   v.small.ip <- v.per.device_ip %>%
     filter(p < 0.05)
   small.ip <- collect(v.small.ip)
@@ -108,8 +125,7 @@ system.time({
     arrange(hod)
   per.hour <- collect(v.per.hour)
 })
-# écoulé: 6 sec
-
+# écoulé: 6 sec / 7 sec
 
 system.time({
   v.per.day.hour <- v.hod %>%
@@ -155,3 +171,13 @@ a
 
 # v.train %>% mutate(x=substr(hour,3,2)) %>% group_by(x) %>% summarise(nb=n())
 
+v.banner_pos.click <- v.train %>%
+  group_by(banner_pos, click) %>%
+  arrange(click, banner_pos) %>%
+  summarise(nb=n())
+system.time({
+  banner_pos.click <- collect(v.banner_pos.click)
+})
+
+# utilisateur     système      écoulé 
+# 0.000       0.000       6.928 

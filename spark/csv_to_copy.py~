@@ -15,7 +15,7 @@ with open(csvfile) as f:
 
 print "create table %s (" % tablename
 
-typed = [("%s int" % c if c in is_integer else "%s text" % c)
+typed = ["%s int" % c if c in is_integer else "%s text" % c
          for c in header]
 
 print ", ".join(typed)
