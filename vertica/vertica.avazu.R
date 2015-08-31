@@ -7,6 +7,18 @@
 # (barely fits on R /data.table with a 16GB RAM desktop)
 # 2.4GB files with Vertica!!!
 
+# on an i7 / 16GB RAM server
+# with 2CPU/4GB RAM on an hdd (from RAM???)
+# load time = 3.8 min
+# typical query: 2-7secs
+
+# on an i7 / 16GB RAM server
+# with 4CPU/4GB RAM on an hdd (from RAM???)
+# load time = 3 min
+# typical query: 1.5 sec
+# large ones -> 55/90 secs
+
+
 require(vertica.dplyr)
 require(data.table)
 
