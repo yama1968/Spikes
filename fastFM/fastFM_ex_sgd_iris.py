@@ -19,16 +19,17 @@ y = np.where(y >= 2, 1, -1)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1234)
 
-from fastFM import sgd
-fm = sgd.FMClassification(n_iter=1000, init_stdev=0.01, l2_reg_w=1,                        
-                          l2_reg_V=1, rank=2,
+from fastFM import sgd, als
+
+fm = als.FMClassification(n_iter=100, init_stdev=0.01, 
+                          l2_reg=0.1,
+                          rank=5,
                           random_state = 1234)
 fm.fit(X_train, y_train)
 
 y_pred_proba = fm.predict_proba(X_test)
 y_pred = np.where(y_pred_proba > 0.5, 1, -1)
 
-from sklearn.metrics import accuracy_score, roc_auc_score
 print confusion_matrix(y_test, y_pred)
 print 'acc:', accuracy_score(y_test, y_pred)
 print 'auc:', roc_auc_score(y_test, y_pred_proba)

@@ -14,8 +14,6 @@ from scipy.sparse import csc_matrix
 import numpy as np
 from fastFM import sgd, als, mcmc
 
-
-
 iris = load_iris()
 X = csc_matrix(iris.data)
 y = iris.target
