@@ -46,9 +46,9 @@ three <- glm(Class ~ Amount + InstallmentRatePercentage + Telephone + ForeignWor
 summary(three)
 get.auc(three)
 
-four <- glm(Class ~ . + (.) * (.),
-            data=training,
-            family="binomial")
-summary(four)
-get.auc(four)
+# four <- glm(Class ~ . + (.) * (.),
+#             data=training,
+#             family="binomial")
+# summary(four)
+# get.auc(four)
 
