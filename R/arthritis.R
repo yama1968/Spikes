@@ -37,8 +37,9 @@ print (linear)
 
 linear <- train(Improved~.-ID,
                 data = Arthritis,
-                trControl = trainControl("cv", 7, predictProbs=TRUE),
+                trControl = trainControl("cv", 7, classProbs=TRUE),
                 method = "glmnet",
                 tuneLength = 20)
 print (linear)
+
 
