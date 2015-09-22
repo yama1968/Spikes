@@ -45,7 +45,7 @@ system.time (
                             family = family, 
                             learner = learner, 
                             metalearner = metalearner,
-                            cvControl = list(V = 5, shuffle = TRUE),
+                            cvControl = list(V = 7, shuffle = TRUE),
                             parallel = "seq",
                             seed = 1234)
 )
@@ -55,7 +55,7 @@ labels <- as.data.frame(validation_frame[,c(y)])[,1]
 
 # Ensemble test AUC
 AUC(predictions=as.data.frame(pred$pred)[,1], labels=labels)
-# 0.876
+# 0.870
 
 L <- length(learner)
 sapply(seq(L), function(l) AUC(predictions = as.data.frame(pred$basepred)[,l], labels = labels))
@@ -86,3 +86,12 @@ AUC(predictions=as.data.frame(pred.deep$pred)[,1], labels=labels.deep)
 # [1] 0.7340168
 # [1] 0.7616866
 
+g <- h2o.gbm(x, y,
+             training_frame=training_frame,
+             nfolds=7,
+             ntrees=200, max_depth=3, learn_rate = 0.1,
+             model_id="one_gbm")
+
+pred.g <- h2o.predict(g, validation_frame)
+AUC(predictions=as.data.frame(pred.g$pred)[,1], labels=labels)
+# 0.7645
