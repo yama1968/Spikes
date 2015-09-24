@@ -15,4 +15,5 @@ model {
         b ~ dunif(0,100)
         
         m <- mean(biz2.rep) * (1-p)
+        m2 <- mean(biz2.rep)
 }

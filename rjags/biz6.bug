@@ -1,0 +1,19 @@
+data {
+        N <- length(biz[])
+}
+
+model {
+    for (i in 1:N) {
+        biz[i]           ~ dpois(m[i])
+        m[i]            <- group[i] * mu
+        group[i]         ~ dbern(p)
+        
+        biz.rep[i]       ~ dpois(m.rep[i])
+        m.rep[i]        <- group.rep[i] * mu
+        group.rep[i]     ~ dbern(p)
+    }
+    p                    ~ dunif(0,1)
+    mu                   ~ dgamma(0.5, 0.0001)
+    
+    true.mean.rep       <- mean(biz.rep)
+}

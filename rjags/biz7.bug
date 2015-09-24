@@ -1,0 +1,13 @@
+data {
+        N <- length(biz[])
+}
+
+model {
+    for (i in 1:N) {
+        biz[i]           ~ dpois(mu)
+        biz.rep[i]       ~ dpois(mu)
+    }
+    mu                   ~ dgamma(0.5, 0.0001)
+    
+    true_mean.rep       <- mean(biz.rep)
+}

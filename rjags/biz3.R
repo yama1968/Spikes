@@ -51,7 +51,7 @@ runbiz <- function (biz,
                                       data = list('biz2' = biz2, 'zero' = zero),
                                       n.chains = chains,
                                       n.adapt = 1000,
-                                      params = c('p', 'm'),
+                                      params = c('p', 'm', 'm2'),
                                       n.iter = 20000))
         stopCluster(cluster)
                 
@@ -59,15 +59,26 @@ runbiz <- function (biz,
 }
 
 
-runmul <- function (b = biz, steps = 3) {
+runmul <- function (b = biz, steps = 3, plot = FALSE) {
         
         N = length(b)
+        
+        models <- list()
         
         for (i in 1:(steps)) {
                 deb <- round(N*(i-1)/(steps+1)+1)
                 fin <- round(N*(i+1)/(steps+1))
                 m <- runbiz(b[deb:fin])
                 print (summary(m))
+                models[[i]] <- m
+                if (plot) {
+                    v <- dctable(m)
+                    plot(v)
+                }
         }
+        
+        models
 }
+
+ms <- runmul(steps=2)
 

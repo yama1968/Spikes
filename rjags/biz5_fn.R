@@ -60,15 +60,16 @@ runbiz <- function (biz,
         cluster <- makeCluster(spec = nodes,
                                type = "SOCK")
 
-        system.time (m <- jags.parfit(cl = cluster,
+        system.time (m <- jags.parfit(cl = nodes,
                                       model = my.model,
                                       data = list('biz2' = biz2, 'zero' = zero),
                                       n.chains = chains,
                                       n.adapt = 1000,
                                       params = c('p', 'm'),
-                                      n.iter = 20000))
+                                      n.iter = 20000,
+                                      flavor = "jags"))
         stopCluster(cluster)
-
+        
         m
 }
 
@@ -91,7 +92,7 @@ runmul <- function (b = biz, steps = 3) {
 }
 
 
-m <- runmul(biz, steps = 1)
+system.time (m <- runmul(biz, steps = 1))
 v <- dctable(m[[1]])
 plot(v)
 
