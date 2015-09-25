@@ -3,7 +3,7 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "ggplot2", "Hmisc", "extraTrees", "Rcpp", "devtools",
       "snow", "foreach", "reshape2", "survival", "randomForest",
       "tidyr", "car", "glmnet", "assertr", "doMC",
-      "optparse")
+      "optparse", "forecast")
 
 p <- p[ ! p %in% installed.packages()]
 

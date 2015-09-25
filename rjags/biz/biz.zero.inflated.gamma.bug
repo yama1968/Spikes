@@ -1,0 +1,26 @@
+data {
+        N <- length(biz[])
+}
+
+model {
+    for (i in 1:N) {
+        biz[i]           ~ dnorm(tab[i, choice[i]], tau)
+        group[i]         ~ dbern(p)
+        choice[i]       <- group[i]+1
+        tab[i,1]         ~ dgamma(a,b)
+        tab[i,2]        <- 0
+        
+        biz.rep[i]       ~ dnorm(tab[i, choice[i]], tau)
+        group.rep[i]     ~ dbern(p)
+        choice.rep[i]   <- group.rep[i]+1
+        tab.rep[i,1]     ~ dgamma(a,b)
+        tab.rep[i,2]    <- 0
+    }
+    p                    ~ dunif(0,1)
+    a                    ~ dunif(0,100)
+    b                    ~ dunif(0,100)
+    tau                 <- 1/sigma/sigma
+    sigma                ~ dunif(0.01,1)
+     
+    true.mean.rep       <- mean(biz.rep)
+}

@@ -6,7 +6,7 @@ epsilon <- rnorm(N, 0, 10)
 y <- 2 * x + 1 + epsilon
 
 
-library('R2jags')
+library('rjags')
 
 chains = 4
 

@@ -55,21 +55,14 @@ runbiz <- function (biz,
         biz2 <- biz[biz>0]
         zero <- length(biz) - length(biz2)
         
-        m <- NA
-        cluster <- NA
-        cluster <- makeCluster(spec = nodes,
-                               type = "SOCK")
-
-        system.time (m <- jags.parfit(cl = nodes,
+        system.time (m <- jags.fit(
                                       model = my.model,
                                       data = list('biz2' = biz2, 'zero' = zero),
                                       n.chains = chains,
                                       n.adapt = 1000,
                                       params = c('p', 'm'),
-                                      n.iter = 20000,
-                                      flavor = "jags"))
-        stopCluster(cluster)
-        
+                                      n.iter = 20000))
+
         m
 }
 
