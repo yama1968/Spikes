@@ -42,11 +42,11 @@ runbiz <- function (biz) {
                            type = "SOCK")
     
     system.time (m <- jags.parfit(cl = cluster,
-                                  model = 'biz7.bug',
+                                  model = 'biz.poisson.bug',
                                   data = list('biz' = biz),
                                   n.chains = chains,
                                   params = c('mu', 'true_mean.rep'),
-                                  n.iter = 2000,
+                                  n.iter = 5000,
                                   n.adapt = 1000))
     stopCluster(cluster)
     

@@ -39,7 +39,7 @@ runbiz <- function (biz, nd = nodes, ch = chains) {
                            type = "SOCK")
     
     system.time (m <- jags.parfit(cl = cluster,
-                                  model = 'biz6.bug',
+                                  model = 'biz.zero.inflated.bug',
                                   data = list('biz' = biz),
                                   n.chains = ch,
                                   inits = function()
