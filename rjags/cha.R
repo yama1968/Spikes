@@ -22,4 +22,7 @@ system.time( { samples <- coda.samples(jags,
                                        5000)
 } )
 
+d <- dic.samples(jags, c("theta"), n.iter = 5000)
+print (d)
+
 plot(samples)

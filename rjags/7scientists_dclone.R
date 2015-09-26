@@ -17,14 +17,17 @@ cluster <- makeCluster(spec = nodes,
 # cluster <- makeCluster(spec = nodes,
 #                         type = "MPI")
 
+load.module("dic")
+
 system.time (m <- jags.parfit(cl = cluster,
                  model = '7scientists2.bug',
                  data = list('x' = x,
                              'n' = n),
                  n.chains = chains,
                  n.adapt = 4000,
-                 params = c("mu", "sigma"),
-                 n.iter = 10000))
+                 params = c("mu", "sigma", "deviance", "pD"),
+                 n.iter = 10000,
+                 DIC = TRUE))
 
 summary(m)
 

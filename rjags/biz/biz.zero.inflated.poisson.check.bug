@@ -1,0 +1,41 @@
+data {
+    for (i in 1:N) {
+        for (k in 1:K) {
+            eq[i,k]     <- equals(biz[i], k-1)
+        }
+    }
+    for (k in 1:K) {
+        m[k]            <- sum(eq[,k])
+    }
+}
+
+model {
+    for (i in 1:N) {
+        biz[i]           ~ dpois(l[i])
+        l[i]            <- group[i] * mu
+        group[i]         ~ dbern(p)
+        
+        biz.rep[i]       ~ dpois(l.rep[i])
+        l.rep[i]        <- group.rep[i] * mu
+        group.rep[i]     ~ dbern(p)
+        
+        for (k in 1:K) {
+           eq.rep[i,k]  <- equals(biz.rep[i], k-1)
+        }
+    }
+
+    for (k in 1:K) {
+        m.rep[k]        <- sum(eq.rep[,k])
+        logE[k]         <- log(N) - mu + (k-1)*log(mu) - logfact(k-1)
+        LR[k]           <- 2*m[k] * (log(m[k]+0.00001) - logE[k])
+        LR.rep[k]       <- 2*m[k] * (log(m.rep[k]+0.00001) - logE[k])
+    }
+
+    G                   <- sum(LR[])
+    G.rep               <- sum(LR.rep[])
+    P                   <- step(G - G.rep)
+    mu                   ~ dgamma(0.5, 0.001)
+    p                    ~ dunif(0, 1)
+    
+    true_mean.rep       <- mean(biz.rep)
+}

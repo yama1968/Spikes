@@ -11,4 +11,8 @@ jags <- jags.model("heart_transplant.bug",
 samples <- coda.samples(jags,
                         c("Is", "pT", "surv.t", "theta"), 10000)
 
-summary(samples)
+print (summary(samples))
+
+d <- dic.samples(jags, c("Is", "pT", "surv.t", "theta"), n.iter = 10000)
+print(d)
+
