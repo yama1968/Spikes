@@ -23,7 +23,7 @@ system.time (m <- jags.parallel(
     n.cluster = nodes,
     n.burnin = 4000,
     n.thin = 4,
-    parameters.to.save = c('deviance', 'theta', 'c', 'sigma', 'm'),
+    parameters.to.save = c('deviance', 'theta', 'c', 'sigma', 'm', 'delta'),
     jags.module = c("dic"),
     n.iter = 20000,
     DIC = TRUE

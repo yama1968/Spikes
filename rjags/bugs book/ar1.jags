@@ -12,10 +12,16 @@ model {
     for (t in 2:n) {
         m[t]   <- c + theta*y[t-1]
         eps[t] <- y[t] - m[t]
+        eps2[t] <- eps[t] * eps[t]
     }
-    m[1]       <- y[1]
+    m[1]       <- y[1] + eps[1]
+    eps[1]      ~ dnorm(0, tau)
+    eps2[1]    <- eps[1] * eps[1]
+    
     theta       ~ dnorm(0, 0.0001)
     c           ~ dnorm(0, 0.0001)
     tau        <- 1/pow(sigma, 2)
     sigma       ~ dunif(0, 100)
+    
+    delta <- sqrt(sum(eps2[]) / n)
 }
