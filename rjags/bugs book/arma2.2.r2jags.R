@@ -33,4 +33,10 @@ print (m)
 
 m.means <- m$BUGSoutput$mean$m
 m.sd <- m$BUGSoutput$sd$m
+print(mean(m.sd))
+
 ts.plot(ts(data$y), ts(m.means+2*m.sd), ts(m.means-2*m.sd), lty=c(1,3,3))
+
+delta.mean <- m$BUGSoutput$mean$delta
+print(delta.mean)
+# 14.99
