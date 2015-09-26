@@ -3,7 +3,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "ggplot2", "Hmisc", "extraTrees", "Rcpp", "devtools",
       "snow", "foreach", "reshape2", "survival", "randomForest",
       "tidyr", "car", "glmnet", "assertr", "doMC",
-      "optparse", "forecast", "R2jags", "dclone", "rjags")
+      "optparse", "forecast", "R2jags", "dclone", "rjags",
+      "quantmod", "fArma", "fGarch")
 
 p <- p[ ! p %in% installed.packages()]
 
