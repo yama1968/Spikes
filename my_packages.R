@@ -5,7 +5,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "tidyr", "car", "glmnet", "assertr", "doMC",
       "optparse", "forecast", "R2jags", "dclone", "rjags",
       "quantmod", "fArma", "fGarch",
-      "RJSONIO", "zoo", "rmgarch", "PerformanceAnalytics")
+      "RJSONIO", "zoo", "rmgarch", "PerformanceAnalytics",
+      "tsoutliers")
 
 p <- p[ ! p %in% installed.packages()]
 
