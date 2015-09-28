@@ -13,8 +13,10 @@ model {
         m[t]    <- c + theta[1]*y[t-1] + theta[2]*y[t-2] + phi*eps[t-1]
         eps[t]  <- y[t] - m[t]
     }
-    eps[1]     ~ dnorm(0, tau)
-    eps[2]     ~ dnorm(0, tau)
+#    eps[1]     ~ dnorm(0, tau)
+#    eps[2]     ~ dnorm(0, tau)
+    eps[1]    <- 0
+    eps[2]    <- 0
     m[1]      <- y[1] - eps[1]
     m[2]      <- y[2] - eps[2]
 
