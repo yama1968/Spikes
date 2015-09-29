@@ -7,7 +7,7 @@ library(ggplot2)
 # devtools::install_github("twitter/AnomalyDetection")
 library(AnomalyDetection)
 
-page <- "FR"
+page <- "US"
 raw_data <- getURL(paste("http://stats.grok.se/json/en/latest90/", page, sep=""))
 data <- fromJSON(raw_data)
 views <- data.frame(timestamp=paste(names(data$daily_views), " 12:00:00", sep=""), stringsAsFactors=F)

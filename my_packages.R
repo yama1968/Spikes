@@ -19,4 +19,9 @@ i.xgboost <- function () {
         devtools::install_github('dmlc/xgboost',subdir='R-package')
 }
 
+i.anomaly.detection <- function() {
+  require(devtools)
+  devtools::install_github("twitter/AnomalyDetection")
+}
+
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
