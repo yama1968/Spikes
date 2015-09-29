@@ -29,5 +29,11 @@ i.breakout <- function () {
   devtools::install_github("twitter/BreakoutDetection")
 }
 
+i.h2o <- function () {
+  require(devtools)
+  install.packages(c("h2o","SuperLearner","cvAUC"))
+  install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
+}
+
 
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
