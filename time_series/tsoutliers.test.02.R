@@ -1,9 +1,10 @@
 
 library(tsoutliers)
+library(ggplot2)
 
 data(Nile)
-resNile1 <- tso(y=Nile, types=c("AO", "LS", "TC"),
-                tsmethod="stsm", args.tsmodel=list(model="local-level"))
+resNile1 <- tso(y=Nile, types=c("AO", "LS", "TC"), cval=3,
+                tsmethod="auto.arima", args.tsmodel=list(model="local-level"))
 print(resNile1)
 
 r <- resNile1

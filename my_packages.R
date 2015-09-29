@@ -24,4 +24,10 @@ i.anomaly.detection <- function() {
   devtools::install_github("twitter/AnomalyDetection")
 }
 
+i.breakout <- function () {
+  require(devtools)
+  devtools::install_github("twitter/BreakoutDetection")
+}
+
+
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
