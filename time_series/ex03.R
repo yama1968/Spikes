@@ -24,3 +24,31 @@ print(a)
 c <- ccf(app.ran.ts, act.ran.ts)
 print(c)
 
+####
+
+www <- "http://staff.elena.aut.ac.nz/Paul-Cowpertwait/ts/motororg.dat"
+Motor.dat <- read.table(www, header=T)
+attach(Motor.dat)
+Comp.ts <- ts(complaints, start=c(1996,1), freq=12)
+plot(Comp.ts, xlab="Time / months", ylab="Complaints")
+
+Comp.hw1 <- HoltWinters(complaints, beta=FALSE, gamma=FALSE)
+Comp.hw1
+plot(Comp.hw1)
+Comp.hw1$SSE
+
+Comp.hw2 <- HoltWinters(complaints, alpha=0.2, beta=FALSE, gamma=FALSE)
+Comp.hw2
+plot(Comp.hw2)
+Comp.hw2$SSE
+
+###
+
+www <- "http://staff.elena.aut.ac.nz/Paul-Cowpertwait/ts/wine.dat"
+wine.dat <- read.table(www, header=T)
+attach(wine.dat)
+sweetw.ts <- ts(sweetw, start=c(1980,1), freq=12)
+plot(sweetw.ts, xlab= "Time (months)", ylab = "sales (1000 litres)")
+
+
+
