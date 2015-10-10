@@ -1,0 +1,123 @@
+---
+title: "Statistical Inference - Project - 2 - ToolGrowth data analysis"
+author: "Yannick Martel"
+date: "17/09/2014"
+output: pdf_document
+---
+
+1- Load the ToothGrowth data and perform some basic exploratory data analyses
+----------------------------------------------------------
+
+We perform loading, have quick look at data and plot a first graphical analysis.
+
+```{r, results='asis'}
+library(datasets)
+library(ggplot2)
+library(plyr)
+library(knitr)
+
+data(ToothGrowth)
+kable(head(ToothGrowth, 4))
+````
+
+```{r}
+str(ToothGrowth)
+df=ToothGrowth
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
+
+We find that:
+
+- there seems to be a reaction to the Vitamin C on tooth growth, with higher response for a stronger dose;
+
+- but the reaction seems to be different between delivery method: stronger reaction at lower dose for orange juice vs ascorbic acid.
+
+2- Provide a basic summary of the data
+----------------------------------------------------------
+
+The population length response average is ```r mean(ToothGrowth$len)``` with standard error ```r sd(ToothGrowth$len)``` for a sample size of ```r length(ToothGrowth$len)```.
+
+We can also compute length response means and standard errors per type of supplement and dose.
+
+```{r, results="asis"}
+s = ddply(ToothGrowth, .(supp, dose), summarise, 
+          LenMean=mean(len), LenStdErr=sd(len), Count=length(len))
+kable(s, format="markdown")
+```
+
+3- Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose
+-------------------------------------------------------
+
+From the analysis we have performed, we can set the following hypothesis:
+
+- Ht: reponse to treatment is higher at low doses (0.5 and 1.0) when using orange juice (OJ) as compared to ascorbic acid (VC), but equivalent at higher dose (2.0).
+
+We propose for this to test the hypothesis that:
+
+- HaOJ and HaVC: growth is better at 2.0 dose than at 0.5 and 1.0, for OJ and VC, respectively
+
+- Hb and Hc: growth is better with OJ than VC at 0.5 and 1.0 doses
+
+- Hd: growth is equivalent with OJ and VC at 2.0
+
+We test the hypothesis by calculating the 95% p-values with the ` t.test` R functino:
+
+- HaOJ.1: len(dose 2.0, OJ) > len(dose 0.5, OJ), the p-value is 
+`r t.test(df[df$supp=='OJ' & df$dose==2.0,]$len, df[df$supp=='OJ' & df$dose==0.5,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than HaOJ.1 is valid.
+
+- HaOJ.2: len(dose 2.0, OJ) > len(dose 1.0, OJ), the p-value is 
+`r t.test(df[df$supp=='OJ' & df$dose==2.0,]$len, df[df$supp=='OJ' & df$dose==1.0,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than HaOJ.2 is valid.
+
+- HaVC.1: len(dose 2.0, VC) > len(dose 0.5, VC), the p-value is 
+`r t.test(df[df$supp=='VC' & df$dose==2.0,]$len, df[df$supp=='VC' & df$dose==0.5,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than HaVC.1 is valid.
+
+- HaVC.2: len(dose 2.0, VC) > len(dose 1.0, VC), the p-value is 
+`r t.test(df[df$supp=='VC' & df$dose==2.0,]$len, df[df$supp=='VC' & df$dose==1.0,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than HaVC.2 is valid.
+
+- Hb: len(dose 0.5, OJ) > len(dose 0.5, VC), the p-value is 
+`r t.test(df[df$supp=='OJ' & df$dose==0.5,]$len, df[df$supp=='VC' & df$dose==0.5,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than Hb is valid.
+
+- Hc: len(dose 1, OJ) > len(dose 1, VC), the p-value is 
+`r t.test(df[df$supp=='OJ' & df$dose==1,]$len, df[df$supp=='VC' & df$dose==1,]$len, paired=F, alternative='g')$p.value*100`%, 
+which is lower than the 5% threshold, and thus we conclude than Hc is valid.
+
+The comparison between the 2.0 doses of OJ and VC is more complex:
+
+- if we take len(dose 2.0, OJ) == len(dose 2.0, VC) as null hypothesis, we get a two-sided p-value of 
+`r t.test(df[df$supp=='OJ' & df$dose==2.0,]$len, df[df$supp=='VC' & df$dose==2.0,]$len, paired=F, alternative='two.sided')$p.value*100`%.
+Thus we cannot disregard the null hypothesis.
+
+- on the other hand we can take first as H0 hypothesis len(dose 2.0, OJ) == len(dose 2.0, VC) + 3.5, and as H1 hypothesis that len(dose 2.0, OJ) < len(dose 2.0, VC) + 4. We compute the p-value of H1 as 
+`r t.test(df[df$supp=='OJ' & df$dose==2.0,]$len, df[df$supp=='VC' & df$dose==2.0,]$len+4, paired=F, alternative='l')$p.value * 100`%, 
+which is lower than 2.5%, and thus we conclude that H1 is valid with 97.5% confidence.
+
+- then we take as H0 len(dose 2.0, OJ) == len(dose 2.0, VC) - 4, and as H1 hypothesis that len(dose 2.0, OJ) > len(dose 2.0, VC) - 3.5. We compute the p-value of H1 as 
+`r t.test(df[df$supp=='OJ' & df$dose==2.0,]$len, df[df$supp=='VC' & df$dose==2.0,]$len-4, paired=F, alternative='g')$p.value * 100`%, which is lower than 2.5%, and thus we conclude that H1 is valid with 97.5% confidence.
+
+Thus we prove that len(dose 2.0, OJ) and len(dose 2.0, VC) are close together in a [-4, 4] interval with 95% confidence.
+
+4. State your conclusions and the assumptions needed for your conclusions
+--------------------------------------------------------------------------------------------
+
+From what we have found, we can safely conclude that:
+
+- with all delivery methods, teeth growth improves from 0.5 mg dose to 2.0 mg dose, and from 1.0 mg to 2.0 mg;
+
+- with 0.5 mg and 1.0 mg doses, teeth growth improves more with orange juice delivery method than ascorbic acid;
+
+- with a 2.0 mg dose, we cannot show that there is a difference in result between the two delivery methods. On the contrary, the results seem to be close together within a [-4, 4] interval.
+
+
+
+
+
+
+
+

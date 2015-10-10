@@ -1,0 +1,91 @@
+---
+title: "Statistical Inference - Project - 1 - Simulation exercise"
+author: "Yannick Martel"
+date: "15/09/2014"
+output:
+  pdf_document:
+    fig_height: 4
+    fig_width: 5
+---
+
+We first initalize the base parameters:
+
+```{r}
+nosim <- 2000
+n <- 40
+lambda <- 0.2
+precision <- 1/sqrt(n)
+```
+
+We work on the $\overline{X}_n$ distribution of $n$ averages of the $X$ exponential distribution, with $n=`r n`$ and $\lambda = `r lambda`$. We compute `r nosim` samples of the distribution, plus the standard error for each sample.
+
+```{r}
+xSamples <- matrix (rexp(nosim*n, lambda), nrow=nosim)
+means <- rowMeans(xSamples)
+sds <- apply(xSamples, 1, sd)
+```
+
+1. Show where the distribution is centered at and compare it to the theoretical center of the distribution
+---------------------------------------------------------------------------------------------
+
+We can compute the mean over the population of $\overline{X}_n$ samples, and the theoretical mean of the $\overline{X}_n$ distribution:
+
+```{r}
+distrib_mean <- mean(means)
+th_mean <- 1/lambda
+```
+
+We compute that the mean of the samples is `r distrib_mean ` vs the theoretical center of distribution at `r th_mean`, which gives the computed mean at `r 100*(distrib_mean-th_mean)/th_mean`% of the theoretical center.
+
+We then plot the density distribution of the 2000 samples, with an overlay of a blue line for the theoretical center of distribution, a red dashed line for the computed mean of samples.
+
+```{r}
+library(ggplot2)
+library(grid)
+
+g <- ggplot(data.frame(i = 1 : nosim, means = means), aes(x = means)) +
+        geom_histogram(binwidth=precision, colour='black', fill='white', 
+                       aes(y = ..density..)) +
+        geom_vline(aes(xintercept=th_mean), color='blue', size=1) +
+        geom_vline(aes(xintercept=distrib_mean), color='red', linetype='dashed', size=1)
+print(g)
+```
+
+We see, both graphically and in figures, that the distribution of the population of `r nosim` samples is nearly centered on the theoretical center of the distribution.
+
+2. Show how variable it is and compare it to the theoretical variance of the distribution
+-----------------------------------------------------------------------------------------
+
+To get the variability of the population, we compute their standard error of the population of $\overline X_n$, and we compare it to the theoretical standard deviation of $\overline{X}_n$, which is ${\sigma}/{\sqrt n}$, where $\sigma = 1/\lambda$ is the standard deviation of the exponential distribution.
+
+```{r}
+distrib_sd <- sd(means)
+th_sd <- 1/lambda/sqrt(n)
+```
+
+We compute that the standard error of the population is `r distrib_sd ` vs the theoretical standard deviation at `r th_sd`, which gives the computed standard deviation at `r 100*(distrib_sd-th_sd)/th_sd`% of the theoretical standard deviation. We can also compare the squared standard error at `r distrib_sd^2` to the theoretical variance at `r th_sd^2`.
+
+3. Show that the distribution is approximately normal
+-----------------------------------------------------------------------------------------------
+
+We overlay a (purple) normal distribution of mean ${1}/{\lambda}$ and standard deviation ${1}/({\lambda \times \sqrt{n}})$ over the computed density distribution to compare them.
+
+```{r}
+print (g + stat_function (fun = function (x) { dnorm(x, mean=th_mean, sd=th_sd) }, 
+                          color='purple'))
+```
+
+We can see that the distribution of $\overline{X}_n$ is approximately normal.
+
+4. Evaluate the coverage of the confidence interval for ${1}/{\lambda}$: $\overline{X} \pm 1.96 \times {S} /{\sqrt n}$
+-------------------------------------------------------------------------------------------
+
+We evaluate the confidence interval for each sample with the formula $\overline{X} \pm 1.96 \times {S} /{\sqrt n}$, where $S$ is the standard error of the sample. We then compute the `r nosim` samples for which the theoretical mean ${1}/{(\lambda \times \sqrt{n})}$ is within this interval.
+
+```{r}
+prop_in_confidence_interval <- mean(((means - 1.96 * sds / sqrt(n)) <= th_mean &
+                                             th_mean <= (means + 1.96 * sds / sqrt(n))))
+```
+
+We get a proportion of `r prop_in_confidence_interval*100`%, which we compare to the theoretical proportion of 95%, associated to the 1.96 coefficient. We found it to be not so close from the theoretical proportion. By experimenting, we found it got closer to the 95% proportion by increasing the $n$ size parameter of the samples from `r n` to a value in the range of 1000.
+

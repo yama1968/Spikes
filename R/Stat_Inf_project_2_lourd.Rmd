@@ -1,0 +1,79 @@
+---
+title: "Statistical Inference - Project - 1 - Simulation exercise"
+author: "Yannick Martel"
+date: "17/09/2014"
+output: pdf_document
+---
+
+1- Load the ToothGrowth data and perform some basic exploratory data analyses
+----------------------------------------------------------
+
+We perform loading, have quick look at data and plot a first graphical analysis.
+
+```{r}
+library(datasets)
+library(ggplot2)
+library(plyr)
+library(knitr)
+
+head(ToothGrowth)
+data(ToothGrowth)
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
+We find that:
+- there seems to be a reaction to the Vitamin C on tooth growth, with higher response for a stronger dose;
+- but the reaction seems to be different between delivery method: stronger reaction at lower dose for orange juice vs ascorbic acid.
+
+2- Provide a basic summary of the data
+----------------------------------------------------------
+
+The population length response average is ```r mean(ToothGrowth$len)``` with standard error ```r sd(ToothGrowth$len)``` for a sample size of ```r length(ToothGrowth$len)```.
+
+We can also compute length response means and standard errors per type of supplement and dose.
+
+```{r, results="asis"}
+s = ddply(ToothGrowth, .(supp, dose), summarise, 
+          LenMean=mean(len), LenStdErr=sd(len), Count=length(len))
+kable(s, format="markdown")
+```
+
+3- Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose
+-------------------------------------------------------
+
+From the analysis we have performed, we can set the following hypothesis:
+- Ht: reponse to treatment is better at low doses (0.5 and 1.0) when using orange juice (OJ) as compared to ascorbic acid (VC), but equivalent at higher dose (2.0).
+
+We propose for this to test the hypothesis that:
+
+- HaOJ and HaVC: growth is better at 2.0 dose than at 5.0 for OJ and VC, respectively
+
+- Hb and Hc: growth is better with OJ than VC at 0.5 and 1.0 doses
+
+- Hd: growth is equivalent with OJ and VC at 2.0 (and thus the null hypothesis is that the length respose are different between the two delivery methods)
+
+We define the following function for calculating the confidence interval for the difference of two sub-populations:
+
+```{r}
+tConfidence = function (X, Y, p) {
+        df = (X$LenStdErr^2 / X$Count + Y$LenStdErr^2 / Y$Count) /
+                ((X$LenStdErr^2/X$Count)^2 / (X$Count-1) + 
+                         (Y$LenStdErr^2/Y$Count)^2 / (Y$Count-1))
+        Y$LenMean - X$LenMean + 
+                c(-1,1) * qt(p, df) * sqrt(X$LenStdErr^2/X$Count + Y$LenStdErr^2/Y$Count)
+}
+```
+
+To test this hypothesis, we calculate 95% T-confidence intervals:
+
+- HaOJ: len(dose 2.0, OJ) > len(dose 0.5, OJ), confidence interval for difference is ```r tConfidence(s[1,], s[3,], 0.95)```. As the interval is all over 0, we can conclude than HaOJ is valid.
+
+- HaVC: len(dose 2.0, VC) > len(dose 0.5, VC), confidence interval for difference is ```r tConfidence(s[4,], s[6,], 0.95)```. As the interval is all over 0, we can conclude than HaVC is valid.
+
+- Hb: len(dose 0.5, OJ) > len(dose 0.5, VC), confidence interval for difference is ```r tConfidence(s[4,], s[1,], 0.95)```. As the interval is all over 0, we can conclude that Hb is valid.
+
+- Hc: len(dose 1.0, OJ) > len(dose 1.0, VC), confidence interval for difference is ```r tConfidence(s[5,], s[2,], 0.95)```. As the interval is all over 0, we can conclude that Hc is valid.
+
+- Hd: len(dose 2.0, OJ) == len(dose 2.0, VC), confidence interval for difference is ```r tConfidence(s[6,], s[3,], 0.55)```. 
+
