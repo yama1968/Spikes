@@ -6,7 +6,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "optparse", "forecast", "R2jags", "dclone", "rjags",
       "quantmod", "fArma", "fGarch",
       "RJSONIO", "zoo", "rmgarch", "PerformanceAnalytics",
-      "tsoutliers", "reshape", "vcd", "fpc", "rrcov")
+      "tsoutliers", "reshape", "vcd", "fpc", "rrcov",
+      "shiny", "UsingR")
 
 p <- p[ ! p %in% installed.packages()]
 
@@ -38,6 +39,11 @@ i.h2o <- function () {
 i.sparkr <- function (){
     require(devtools)
     devtools::install_github("apache/spark", ref="master", subdir="R/pkg")
+}
+
+i.shiny <- function () {
+    require(devtools)
+    devtools::install_github('rstudio/rsconnect')
 }
 
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
