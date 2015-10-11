@@ -25,5 +25,5 @@ model {
     sigma                ~ dunif(0.01,1)
      
     true.mean.rep       <- mean(biz.rep)
-    mean.diff           <- mean(diff)
+    pval                <- mean(diff)
 }

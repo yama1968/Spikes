@@ -42,7 +42,7 @@ runbiz <- function (biz, nd = nodes, ch = chains) {
         n.burnin = 1000,
         inits = function()
             list(group = 1*(biz > 0)),
-        parameters.to.save = c('p', 'true.mean.rep', 'sigma', 'a', 'b', 'mean.diff',
+        parameters.to.save = c('p', 'true.mean.rep', 'sigma', 'a', 'b', 'pval',
                                'Deviance', 'deviance', 'pD'),
         jags.module = c("dic"),
         n.iter = 6000,
@@ -62,7 +62,7 @@ runmul <- function (b = biz, steps = 3) {
         deb <- round(N*(i-1)/(steps+1)+1)
         fin <- round(N*(i+1)/(steps+1))
         m <- runbiz(b[deb:fin])
-        print (summary(m))
+        print(m)
     }
 }
 

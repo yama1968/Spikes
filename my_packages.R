@@ -7,11 +7,12 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "quantmod", "fArma", "fGarch",
       "RJSONIO", "zoo", "rmgarch", "PerformanceAnalytics",
       "tsoutliers", "reshape", "vcd", "fpc", "rrcov",
-      "shiny", "UsingR")
+      "shiny", "UsingR",
+      "maps", "mapproj")
 
 p <- p[ ! p %in% installed.packages()]
 
-print (p)
+print(p)
 
 install.packages(p)
 
