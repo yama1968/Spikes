@@ -22,6 +22,8 @@ model {
         for (k in 1:K) {
            eq.rep[i,k]  <- equals(biz.rep[i], k-1)
         }
+        
+        diff[i]         <- step(biz[i] - biz.rep[i])
     }
 
     for (k in 1:K) {
@@ -38,4 +40,5 @@ model {
     p                    ~ dunif(0, 1)
     
     true_mean.rep       <- mean(biz.rep)
+    mean.diff           <- mean(diff)
 }

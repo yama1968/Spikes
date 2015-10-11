@@ -47,7 +47,8 @@ runbiz <- function (biz) {
                                   inits = function()
                                       list(group=1*(biz>0)),
                                   n.chains = chains,
-                                  params = c('mu', 'true_mean.rep', 'G', 'G.rep', 'P', 'p'),
+                                  params = c('mu', 'true_mean.rep', 'G', 'G.rep', 'P', 'p',
+                                             'mean.diff'),
                                   n.iter = 10000,
                                   n.adapt = 1000))
     stopCluster(cluster)

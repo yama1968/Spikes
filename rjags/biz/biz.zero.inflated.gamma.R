@@ -44,9 +44,11 @@ runbiz <- function (biz, nd = nodes, ch = chains) {
                                   n.chains = ch,
                                   inits = function()
                                        list(group=1*(biz>0)),
-                                  params = c('p', 'true.mean.rep', 'sigma', 'a', 'b'),
+                                  params = c('p', 'true.mean.rep', 'sigma', 'a', 'b', 'mean.diff',
+                                             'Deviance', 'deviance', 'pD'),
                                   n.iter = 6000,
-                                  n.adapt = 1000))
+                                  n.adapt = 1000,
+                                  DIC = T))
     
     stopCluster(cluster)
 
