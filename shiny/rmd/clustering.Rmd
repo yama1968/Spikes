@@ -1,0 +1,22 @@
+---
+title: "Clustering"
+author: "Yannick Martel"
+date: "12 octobre 2015"
+output: html_document
+runtime: shiny
+---
+
+This is for testing clustering.
+
+
+
+```{r, echo=FALSE}
+
+source("helpers.R")
+
+options(shiny.deprecation.messages = FALSE)
+    
+kmeans_cluster(iris)
+
+```
+
