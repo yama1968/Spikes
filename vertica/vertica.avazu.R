@@ -33,16 +33,16 @@ v.types <- rep("varchar", length(t.names))
 v.types[2] <- "integer"
 names(v.types) <- t.names
 
-v <- src_vertica(dsn = "AvazuDSN")
-
-if (db_has_table(v$con, "train")) {
-  db_drop_table(v$con, "train")
-}
-
-db_create_table(v$con, "train", v.types)
-system.time({
-  db_load_from_file(v, "train", train_file, sep=",", skip=1L, append=FALSE)
-})
+# v <- src_vertica(dsn = "AvazuDSN")
+# 
+# if (db_has_table(v$con, "train")) {
+#   db_drop_table(v$con, "train")
+# }
+# 
+# db_create_table(v$con, "train", v.types)
+# system.time({
+#   db_load_from_file(v, "train", train_file, sep=",", skip=1L, append=FALSE)
+# })
 
 # full
 # utilisateur     système      écoulé 
