@@ -16,6 +16,9 @@ print(p)
 
 install.packages(p)
 
+# sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
+# sudo apt-get install jags
+
 i.xgboost <- function () {
         require(devtools)
         devtools::install_github('dmlc/xgboost',subdir='R-package')
@@ -47,4 +50,4 @@ i.shiny <- function () {
     devtools::install_github('rstudio/rsconnect')
 }
 
-# sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
+
