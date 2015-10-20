@@ -5,7 +5,7 @@ library('R2jags')
 # prepare data
 
 # biz <- c(30, 0, 0, 50, 0, 20, 0, 0, 120, 0, 0, 0, 80, 0)
-biz <- c(rep(0,11),
+hbiz <- c(rep(0,11),
          14,
          0, 0,
          34,
@@ -20,7 +20,8 @@ biz <- c(rep(0,11),
          0,0,
          241,
          0, 50,0,0,0,0,
-         5, 95, 0, 35)
+         5, 95, 0, 35,
+         0, 290)
 
 
 # model
@@ -66,5 +67,5 @@ runmul <- function (b = biz, steps = 3) {
     }
 }
 
-system.time(m <- runbiz(biz) )
+system.time(m <- runbiz(hbiz) )
 m

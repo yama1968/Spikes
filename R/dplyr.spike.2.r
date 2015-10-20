@@ -52,9 +52,8 @@ doubled <- branded %>%
 doubled %>%
     filter(brand %in% c("Hornet", "Merc", "Toyota"))
 
-doubled %>%
+regrouped <- doubled %>%
     group_by(brand) %>%
     arrange(brand, hp, disp) %>%
     mutate(hp.cum   = cumsum(hp),
-           gap.cum  = cumsum(gap)) %>%
-    filter(! is.na(gap.cum))
+           gap.cum  = cumsum(gap))
