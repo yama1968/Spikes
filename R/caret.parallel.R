@@ -5,3 +5,5 @@ library(caret)
 
 tc <- trainControl(method="boot",number=25)
 train(Species~.,data=iris,method="nnet",trControl=tc)
+
+stopCluster(cl)
