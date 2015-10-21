@@ -1,4 +1,5 @@
 library('R2jags')
+library(ggplot2)
 
 d <- list(velocity = c(9.172, 9.35, 9.483, 9.558, 9.775, 10.227, 10.406, 
                        16.084, 16.17, 18.419, 18.552, 18.6, 18.927, 19.052, 
@@ -41,8 +42,8 @@ train.jags <- function(data,
                        model     = "galaxy.jags",
                        chains    = 8,
                        nodes     = 8,
-                       burn      = 500,
-                       iter      = 1000) {
+                       burn      = 1000,
+                       iter      = 10000) {
     
     system.time(m <- jags.parallel(
         model.file          = model,
@@ -51,6 +52,7 @@ train.jags <- function(data,
         n.cluster           = nodes,
         n.burnin            = burn,
         parameters.to.save  = c('dens', 'cl',
+                                'pi', 
                                 "deviance", "pD",
                                 "p.val"),
         jags.module         = c("dic"),
@@ -61,3 +63,29 @@ train.jags <- function(data,
     
     m
 }
+
+plot.pi <- function(m) {
+    barplot(m$BUGSoutput$mean$pi, names.arg = 1:20)
+}
+
+ql <- function(p, l) {
+    apply(l, 2, function(x) quantile(x, probs = p))
+}
+
+plot.dens <- function(m, d) {
+    sim <- m$BUGSoutput$sims.list$dens
+    
+    df <- data.frame(x   = d$dens.x,
+                     q10 = ql(.10, sim),
+                     q50 = ql(.50, sim),
+                     q90 = ql(.90, sim))
+    ggplot(df, aes(x)) +
+        geom_line(aes(y = q10), colour = "green") +
+        geom_line(aes(y = q50), colour = "red") +
+        geom_line(aes(y = q90), colour = "green") +
+        geom_line(data = data.frame(v = d$velocity), aes(v), stat = "density", colour = "grey20") +
+        ylab("Probability density") +
+        xlab("Galaxy velocity(x 1000 km/h)")
+}
+
+
