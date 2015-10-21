@@ -1,0 +1,51 @@
+model { 
+  for (i in 1:n) {
+    velocity[i]  ~ dnorm(mu[i], tau[i])
+    mu[i]       <- mu.mix[group[i]]
+    tau[i]      <- tau.mix[group[i]]
+    group[i]     ~ dcat(pi[])
+    for (j in 1:C) {
+      gind[i,j] <- equals(j, group[i])
+    }
+  }
+  
+  p[1]          <- q[1]
+  for (j in 2:C) {
+    p[j]        <- q[j]*(1 - q[j-1])*p[j-1]/q[j-1]
+  }
+  
+  for (j in 1:C) {
+    q[j]         ~ dbeta(1, alpha)
+    pi[j]       <- p[j]/sum(p[])
+    mu.mix[j]    ~ dnorm(amu, mu.prec[j])
+    mu.prec[j]  <- bmu*tau.mix[j]
+    tau.mix[j]   ~ dgamma(aprec, bprec)
+  }
+  
+  alpha         <- 1
+#  Could replace constant alpha with a prior
+# alpha          ~ dgamma(2, 4)
+# alpha          ~ dunif(0.3, 10) 
+  
+  amu            ~ dnorm(0, 0.001)
+  bmu            ~ dgamma(0.5, 50)
+  aprec         <- 2
+  bprec          ~ dgamma(2, 1)
+  K             <- sum(cl[])
+  
+  for (j in 1:C) {
+    sumind[j]   <- sum(gind[,j])
+    cl[j]       <- step(sumind[j]-1+0.001) # cluster j used in this
+                                           # iteration
+  } 
+  
+  for (j in 1:ndens) {
+    for (i in 1:C) {
+      dens.cpt[i,j] <- pi[i]*
+                     sqrt(tau.mix[i] / (2*3.141592654))*
+                     exp(-0.5*tau.mix[i]*(mu.mix[i] - dens.x[j])
+                                        *(mu.mix[i] - dens.x[j]))
+    }
+    dens[j]         <- sum(dens.cpt[,j])
+  }
+}
