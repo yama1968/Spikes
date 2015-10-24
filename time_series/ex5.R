@@ -56,4 +56,112 @@ temp.lm <- lm(temp ~ 0 + Time + factor(Seas))
 summary(temp.lm)
 confint(temp.lm)
 
+##
+
+SIN <- COS <- matrix(nrow = length(Time), ncol = 6)
+for (i in 1:6) {
+    COS[, i] <- cos(2 * pi * i * Time / 12)
+    SIN[, i] <- sin(2 * pi * i * Time / 12)
+}
+
+Time <- (time(temp) -mean(time(temp)))/sd(time(temp))
+
+temp.lm1 <- lm(temp ~ Time + I(Time ^2) + COS[, 1] + SIN[, 1] +
+                   COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] + COS[, 4] + SIN[, 4] +
+                   COS[, 5] + SIN[, 5] + COS[, 6] + SIN[, 6])
+summary(temp.lm1)
+AIC(temp.lm1)
+
+temp.lm2 <- lm(temp ~ Time + COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] +
+                   COS[, 6] + SIN[, 6])
+summary(temp.lm2)
+AIC(temp.lm2)
+
+# the best fit for a linear model
+temp.lm3 <- step(temp.lm1)
+summary(temp.lm3)
+AIC(temp.lm3)
+
+plot(time(temp), resid(temp.lm3), type = "l")
+acf(resid(temp.lm3))
+pacf(resid(temp.lm3))
+
+# fitting the residual on an AR time serie
+res.ar <- ar(resid(temp.lm3), method = "mle")
+res.ar
+
+# check for autocorrelation in residual
+acf(res.ar$res[-(1:2)])
+
+temp.gls1 <- gls(temp ~ Time + I(Time ^2) + COS[, 1] + SIN[, 1] +
+                    COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] + COS[, 4] + SIN[, 4] +
+                    COS[, 5] + SIN[, 5] + COS[, 6] + SIN[, 6])
+summary(temp.gls1)
+acf(temp.gls1$residuals)
+
+temp.gls2 <- gls(temp ~ Time + 
+                     COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] + COS[, 4] + 
+                     SIN[, 5] + SIN[, 6])
+summary(temp.gls2)
+acf(temp.gls2$residuals)
+
+
+####################################################################################################
+#
+# on air passengers
+#
+
+data(AirPassengers)
+AP <- AirPassengers
+plot(AP)
+plot(log(AP))
+
+SIN <- COS <- matrix(nrow = length(AP), ncol = 6)
+for (i in 1:6) {
+    COS[, i] <- cos(2 * pi * i * time(AP))
+    SIN[, i] <- sin(2 * pi * i * time(AP))
+}
+TIME <- (time(AP) - mean(time(AP)))/sd(time(AP))
+mean(time(AP))
+
+AP.lm1 <- lm(log(AP) ~ TIME + I(TIME ^2) + I(TIME ^3) + I(TIME ^4) + COS[, 1] + SIN[, 1] +
+                   COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] + COS[, 4] + SIN[, 4] +
+                   COS[, 5] + SIN[, 5] + COS[, 6] + SIN[, 6])
+summary(AP.lm1)
+AIC(AP.lm1)
+
+AP.lm3 <- step(AP.lm1)
+summary(AP.lm3)
+AIC(AP.lm3)
+
+acf(resid(AP.lm3))
+
+AP.gls <- gls(log(AP) ~ TIME + I(TIME ^2) + COS[, 1] + SIN[, 1] +
+                      COS[, 2] + SIN[, 2] + COS[, 3] + SIN[, 3] + COS[, 4] + SIN[, 4] +
+                      SIN[, 5],
+                  correlation = corAR1(0.6))
+summary(AP.gls)
+
+AP.ar <- ar(resid(AP.lm3), order = 1, method = "mle")
+acf(AP.ar$res[-1])
+
+
+# predicting
+
+new.t <- time(ts(start = 1961, end = c(1970, 12), fr = 12))
+TIME <- (new.t - mean(time(AP)))/sd(time(AP))
+
+SIN <- COS <- matrix(nrow = length(new.t), ncol = 6)
+for (i in 1:6) {
+    COS[, i] <- cos(2 * pi * i * new.t)
+    SIN[, i] <- sin(2 * pi * i * new.t)
+}
+SIN <- SIN[, -6]
+new.dat <- data.frame(TIME = as.vector(TIME),
+                      SIN  = SIN,
+                      COS  = COS)
+AP.pred.ts <- exp(ts(predict(AP.gls, new.dat), st = 1961, fr = 12))
+ts.plot(log(AP), log(AP.pred.ts), lty = 1:2)
+ts.plot(AP, AP.pred.ts, lty = 1:2)
+
 
