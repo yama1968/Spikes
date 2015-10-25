@@ -3,7 +3,7 @@ data {
 }
 
 model {
-    # ARMA(2,1):
+    # ARMA(2,2):
     for (t in 3:n) {
         y[t]     ~ dnorm(m[t], tau)
     }
@@ -11,7 +11,6 @@ model {
         m[t]    <- c + theta[1]*y[t-1] + theta[2]*y[t-2] + phi[1]*eps[t-1] + phi[2]*eps[t-2]
         eps[t]  <- y[t] - m[t]
         eps2[t] <- eps[t] * eps[t]
-        
     }
     eps[1]     ~ dnorm(0, tau)
     eps2[1]   <- eps[1] * eps[1]
@@ -25,9 +24,14 @@ model {
         phi[i] ~ dnorm(0, 0.0001)
     }
     
+    for (t in 1:n) {
+        p.test[t] <- step(eps[t])
+    }
+    
     c          ~ dnorm(0, 0.0001)
     tau       <- 1/pow(sigma, 2)
     sigma      ~ dunif(0, 100)
     
     delta     <- sqrt(sum(eps2[]) / n)
+    p         <- mean(p.test)
 }

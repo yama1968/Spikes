@@ -3,7 +3,7 @@ library('R2jags')
 chains <- 4
 nodes <- 4
 
-data = list(n = 100, 
+data = list( 
             y = c(100.8, 81.6, 66.5, 34.8, 30.6, 7, 19.8, 92.5,
                   154.4, 125.9, 84.8, 68.1, 38.5, 22.8, 10.2, 24.1, 82.9,
                   132, 130.9, 118.1, 89.9, 66.6, 60, 46.9, 41, 21.3, 16,
@@ -40,3 +40,5 @@ ts.plot(ts(data$y), ts(m.means+2*m.sd), ts(m.means-2*m.sd), lty=c(1,3,3))
 delta.mean <- m$BUGSoutput$mean$delta
 print(delta.mean)
 # 14.99
+
+

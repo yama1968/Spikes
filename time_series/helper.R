@@ -12,3 +12,8 @@ download.if.needed <- function(fname,
         loc
     }
 }
+
+ql <- function(p, l) {
+    apply(l, 2, function(x) quantile(x, probs = p))
+}
+

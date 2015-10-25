@@ -48,7 +48,7 @@ train.jags <- function(data,
     
     system.time(m <- jags.parallel(
         model.file          = model,
-        data                = d,
+        data                = data,
         n.chains            = chains,
         n.cluster           = nodes,
         n.burnin            = burn,
