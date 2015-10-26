@@ -22,7 +22,7 @@ model {
     a                    ~ dunif(0,100)
     b                    ~ dunif(0,100)
     tau                 <- 1/sigma/sigma
-    sigma                ~ dunif(0.001, 0.01)
+    sigma                ~ dunif(0.01,1)
      
     true.mean.rep       <- mean(biz.rep)
     pval                <- mean(diff)
