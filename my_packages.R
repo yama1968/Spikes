@@ -9,7 +9,7 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "tsoutliers", "reshape", "vcd", "fpc", "rrcov",
       "shiny", "UsingR",
       "maps", "mapproj", "corrplot",
-      "manipulate", "ggfortify")
+      "manipulate", "ggfortify", "changepoint")
 
 p <- p[ ! p %in% installed.packages()]
 
