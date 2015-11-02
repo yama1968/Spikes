@@ -28,6 +28,12 @@ foo$Age <- NULL
 Art <- structable(Improved ~ Treatment + Sex + old, 
                   data = foo)
 cotabplot(Improved ~Treatment + old | Sex, data = Art)
-cotabplot(Improved ~Treatment + old | Sex, data = foo)
 
 
+library(vcd)
+data("Arthritis")
+Arthritis$CatAge <- as.factor(20 * (Arthritis$Age %/% 20))
+cotabplot(Improved ~ Treatment + CatAge | Sex, data = Arthritis)
+
+
+independence_table(Art)
