@@ -33,7 +33,16 @@ cotabplot(Improved ~Treatment + old | Sex, data = Art)
 library(vcd)
 data("Arthritis")
 Arthritis$CatAge <- as.factor(20 * (Arthritis$Age %/% 20))
-cotabplot(Improved ~ Treatment + CatAge | Sex, data = Arthritis)
+Arthritis$Target <- Arthritis$Improved != "None"
+
+cotabplot(~ Sex + Treatment + CatAge | Target, data = Arthritis)
+
+cotabplot(~ Treatment + CatAge + Improved | Sex, data = Arthritis)
+
+cotabplot(~ Treatment + CatAge + Improved | Sex, data = Arthritis,
+          gp = shading_hsv,
+          gp_args = list(interpolate = 1:8))
+
 
 
 independence_table(Art)
