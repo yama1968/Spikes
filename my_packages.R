@@ -11,7 +11,7 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "maps", "mapproj", "corrplot",
       "manipulate", "ggfortify", "changepoint",
       "rbenchmark", "mclust",
-      "bnlearn")
+      "bnlearn", "catnet")
 
 p <- p[ ! p %in% installed.packages()]
 
@@ -53,4 +53,6 @@ i.shiny <- function () {
     devtools::install_github('rstudio/rsconnect')
 }
 
+source("https://bioconductor.org/biocLite.R")
+biocLite("Rgraphviz")
 
