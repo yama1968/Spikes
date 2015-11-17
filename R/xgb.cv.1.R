@@ -66,14 +66,12 @@ output_vector = df[,Y:=0][Improved == "Marked",Y:=1][,Y]
 # Following is the same process as other demo
 cat("Learning...\n")
 
+set.seed(1234)
 cv <- xgb.cv(params = list(max.depth = 3,
-                           eta = 0.2, nthread = 2, objective = "binary:logistic"),
+                           eta = 0.1, nthread = 2, objective = "binary:logistic"),
              nrounds = 5,
              data = sparse_matrix, 
              label = output_vector,
-             metrics = list("error"),
-#              early.stop.round = 3,
-#              maximize = FALSE,
+             metrics = list("auc"),
              nfold = 7)
-
 
