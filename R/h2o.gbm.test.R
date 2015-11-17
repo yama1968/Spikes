@@ -1,6 +1,4 @@
 require("h2o")
-require("cvAUC")
-require("parallel")
 
 if (!require(vcd)) {
   install.packages('vcd') #Available in Cran. Used for its dataset with categorical values.
@@ -18,14 +16,15 @@ localH2O <- h2o.init(nthreads=-1)
 
 df.hex <- as.h2o(localH2O, df, "Arthritis")
 
-model <- h2o.gbm(y = "target", 
-                 x = c("Treatment","AgeFactor","Sex"),
-                 training_frame = df.hex,
-                 distribution = "bernoulli",
-                 max_depth = 3,
-                 nfolds    = 4,
-                 ntrees    = 8,
-                 balance_classes = FALSE)
+model <- h2o.gbm(y                = "target", 
+                 x                = c("Treatment","AgeFactor","Sex"),
+                 training_frame   = df.hex,
+                 distribution     = "bernoulli",
+                 max_depth        = 3,
+                 nfolds           = 4,
+                 ntrees           = 20,
+                 balance_classes  = FALSE,
+                 seed             = 1234)
 
 print(model)
 
