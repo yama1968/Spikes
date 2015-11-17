@@ -18,6 +18,6 @@ model <- h2o.gbm(y = "CAPSULE", x = c("AGE","RACE","PSA","DCAPS"),
                  training_frame = prostate.hex,
                  max_depth = 5,
                  nfolds    = 7,
-                 ntrees    = 100)
+                 ntrees    = 8)
 
 model
