@@ -18,7 +18,7 @@ params = list(max.depth = 3,
 
 set.seed(1234)
 cv <- xgb.cv(params   = params,
-             nrounds  = 8,
+             nrounds  = 2,
              data     = X, 
              label    = y,
              metrics  = list("auc"),
@@ -31,6 +31,6 @@ bst <- xgb.train(data         = train,
                  params       = params,
                  watchlist    = watchlist,
                  eval.metric  = "auc",
-                 nrounds      = 8)
+                 nrounds      = 2)
 
 xgb.importance(feature_names = colnames(X), model = bst)
