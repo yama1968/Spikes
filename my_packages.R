@@ -11,7 +11,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "maps", "mapproj", "corrplot",
       "manipulate", "ggfortify", "changepoint",
       "rbenchmark", "mclust",
-      "bnlearn", "catnet", "rbmn")
+      "bnlearn", "catnet", "rbmn",
+      "readr")
 
 p <- p[ ! p %in% installed.packages()]
 
@@ -45,7 +46,7 @@ i.h2o <- function () {
 
 i.sparkr <- function (){
     require(devtools)
-    devtools::install_github("apache/spark", ref="master", subdir="R/pkg")
+    devtools::install_github("apache/spark", ref = "master", subdir = "R/pkg")
 }
 
 i.shiny <- function () {
