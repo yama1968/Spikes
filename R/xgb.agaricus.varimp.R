@@ -34,5 +34,7 @@ bst <- xgb.train(data         = dtrain,
 xgb.importance(train$data@Dimnames[[2]], model = bst)
 
 # Same thing with co-occurence computation this time
-xgb.importance(train$data@Dimnames[[2]], model = bst, data = train$data, label = train$label)
+importanceRaw <- xgb.importance(train$data@Dimnames[[2]], model = bst, data = train$data, label = train$label)
+importanceClean <- importanceRaw[,`:=`(Cover=NULL, Frequency=NULL)]
+as.data.frame(importanceClean)
 
