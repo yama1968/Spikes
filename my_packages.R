@@ -12,7 +12,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "manipulate", "ggfortify", "changepoint",
       "rbenchmark", "mclust",
       "bnlearn", "catnet", "rbmn",
-      "readr", "kohonen", "dummies", "maptools", "rgeos")
+      "readr", "kohonen", "dummies", "maptools", "rgeos",
+      "apcluster")
 
 p <- p[ ! p %in% installed.packages()]
 
