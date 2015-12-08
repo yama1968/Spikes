@@ -43,7 +43,26 @@ dl.model <- h2o.deeplearning(y                = "target",
 print(dl.model)
 h2o.varimp(dl.model)
 
-# ggplot(df = tail(dl.model@model$scoring_history, -1),
-#        aes(x = epochs, y = training_AUC)) +
-#   geom_line()
+#####
+
+ae.model <- h2o.deeplearning(x                = c("Treatment","AgeFactor","Sex"),
+                             autoencoder      = T,
+                             training_frame   = df.hex,
+                             hidden           = c(20, 5, 2, 5, 20),
+                             epochs           = 100,
+                             variable_importance = TRUE,
+                             seed             = 1234)
+
+features <- as.data.frame(h2o.deepfeatures(ae.model, df.hex, layer = 3))
+
+library(ggplot2)
+
+qplot(as.data.frame(h2o.anomaly(ae.model, df.hex))$Reconstruction.MSE, 
+      geom = "histogram",
+      fill = I("green"))
+
+qplot(DF.L3.C1, DF.L3.C2,
+      data    = features,
+      color   = Arthritis$Improved,
+      main    = "C1 vs C2")
 
