@@ -14,7 +14,7 @@ df$Improved  <- NULL
 
 localH2O <- h2o.init(nthreads=-1)
 
-df.hex <- as.h2o(localH2O, df, "Arthritis")
+df.hex <- as.h2o(df, "Arthritis")
 
 model <- h2o.gbm(y                = "target", 
                  x                = c("Treatment","AgeFactor","Sex"),
