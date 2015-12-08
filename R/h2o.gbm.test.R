@@ -1,4 +1,5 @@
 require("h2o")
+require(ggplot2)
 
 if (!require(vcd)) {
   install.packages('vcd') #Available in Cran. Used for its dataset with categorical values.
@@ -30,3 +31,19 @@ print(model)
 
 h2o.varimp(model)
 h2o.confusionMatrix(model)
+
+dl.model <- h2o.deeplearning(y                = "target", 
+                             x                = c("Treatment","AgeFactor","Sex"),
+                             training_frame   = df.hex,
+                             hidden           = c(10, 10, 10, 10),
+                             nfolds           = 4,
+                             epochs           = 10,
+                             variable_importance = TRUE,
+                             seed             = 1234)
+print(dl.model)
+h2o.varimp(dl.model)
+
+# ggplot(df = tail(dl.model@model$scoring_history, -1),
+#        aes(x = epochs, y = training_AUC)) +
+#   geom_line()
+
