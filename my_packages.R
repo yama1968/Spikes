@@ -13,7 +13,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "rbenchmark", "mclust",
       "bnlearn", "catnet", "rbmn",
       "readr", "kohonen", "dummies", "maptools", "rgeos",
-      "apcluster", "igraph", "MonetDB.R", "RODBC", "RJDBC")
+      "apcluster", "igraph", "MonetDB.R", "RODBC", "RJDBC",
+      "mixtools", "tclust")
 
 
 p <- p[ ! p %in% installed.packages()]
@@ -24,10 +25,11 @@ install.packages(p)
 
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
 # sudo apt-get install jags
+# sudo apt-get install libiodbc2-dev
 
 i.xgboost <- function () {
         require(devtools)
-        devtools::install_github('dmlc/xgboost',subdir='R-package')
+        devtools::install_github('dmlc/xgboost',subdir = 'R-package')
 }
 
 i.anomaly.detection <- function() {
