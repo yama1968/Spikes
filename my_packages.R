@@ -14,7 +14,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "bnlearn", "catnet", "rbmn",
       "readr", "kohonen", "dummies", "maptools", "rgeos",
       "apcluster", "igraph", "MonetDB.R", "RODBC", "RJDBC",
-      "mixtools", "tclust")
+      "mixtools", "tclust",
+      "Lahman", "VGAM", "Runit")
 
 
 p <- p[ ! p %in% installed.packages()]
@@ -58,6 +59,8 @@ i.shiny <- function () {
     devtools::install_github('rstudio/rsconnect')
 }
 
-source("https://bioconductor.org/biocLite.R")
-biocLite("Rgraphviz")
+i.bioclite <- function () {
+    source("https://bioconductor.org/biocLite.R")
+    biocLite("Rgraphviz")
+}
 
