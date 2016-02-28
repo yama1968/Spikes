@@ -22,3 +22,12 @@ def sum2d(arr):
 a = arange(9).reshape(3,3)
 %timeit _ = (sum2d(a))
 
+def sum2d_nojit(arr):
+    M, N = arr.shape
+    result = 0.0
+    for i in range(M):
+        for j in range(N):
+            result += arr[i,j]
+    return result
+
+%timeit _ = (sum2d_nojit(a))
