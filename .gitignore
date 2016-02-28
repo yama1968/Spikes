@@ -44,3 +44,5 @@ Temporary Items
 
 .Rhistory
 .ipynb_checkpoints
+*~
+__pycache__/*
