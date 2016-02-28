@@ -1,0 +1,48 @@
+#
+
+import json
+import sys
+
+class KtRegistry(object):
+
+    _registers = dict()
+
+    def __init__(self, r_name, r_comment=None):
+        self._name = r_name
+        self._comment = r_comment
+        self._objects = dict()
+        _registers[name] = self
+
+    @classmethod
+    def get_register(cls, r_name):
+        """Retrieve a register from the class directory"""
+        return cls._registers[r_name]
+
+    def publish(self, name, **kwargs):
+        """Publish into the register"""
+        self._objects[name] = kwargs
+        return self
+
+    def retrieve(self, name, default=None):
+        """Retrieve from register"""
+        if default is None:
+            return self._objects[name]
+        else:
+            return self._objects.get(name, default)
+
+    def publish_fun(self, name, **kwargs):
+        """Decorator for publishing function"""
+        def myfun(fun):
+            self._objects[name] = {'fun': fun}.update(kwargs)
+            return fun
+        return myfun
+
+    def run_fun(self, name, **kwargs):
+        """Run function"""
+        fun_dict = self._objects[name]
+        fun = fun_dict["fun"]
+        del fun_dict["fun"]
+        return fun(**kwargs.update(fun_dict))
+
+
+    

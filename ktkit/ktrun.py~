@@ -1,0 +1,80 @@
+#
+
+import json
+import sys
+from sys import stderr
+import ktpipes
+import ktactions
+
+main_actions = dict()
+
+def register_action(name, nargs):
+
+    def myregister(fun):
+        global main_actions
+        main_actions[name] = (fun, nargs)
+        return fun
+
+    return myregister
+
+
+@register_action("display", 3)
+def display(config, transfo, learner, *args):
+    """Display the arguments, once unparsed a bit.
+    """
+
+    stderr.write("Config is %s\n" % str(config))
+    stderr.write("Transfo is %s\n" % str(ktpipes.KtPipe.from_json(config[transfo])))
+    stderr.write("Learner is %s\n" % str(learner))
+
+
+@register_action("help", 0)
+def default_help(*args):
+    """Display help.
+    """
+    
+    stderr.write("Valid actions are: \n%s\n" % \
+                     "\n".join(["- %s (%d args)" % (k, main_actions[k][1]) for k in main_actions]))
+    sys.exit(-1)
+
+
+@register_action("transform", 2)
+def transform(config, transfo, *args, **kwargs):
+    """Apply transformer to nothing for now.
+    """
+    
+    pipe = ktpipes.KtPipe.from_json(config[transfo])
+
+    return pipe.fit_transform(None)
+
+
+def past_indice(l, i):
+    """Get part of list past i position - included.
+    Return [] is list is shorter
+    """
+    
+    return l[i:] if i <= len(l) else []
+
+
+def main(argv):
+
+    action = argv[1] if len(argv) >= 2 else "help"
+
+    stderr.write("args are: %s.\n" % str(argv))
+
+    if len(argv) >=3:
+        with open(argv[2]) as f_config:
+            config = json.load(f_config)
+    else:
+        config = dict()
+
+    action = main_actions.get(action, (default_help, 0))
+
+    if len(argv) < action[1]+2:
+        default_help(config)
+    else:
+        action[0](config, *past_indice(argv, 3))
+
+
+if __name__ == "__main__":
+    main(sys.argv)
