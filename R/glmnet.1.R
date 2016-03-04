@@ -21,9 +21,9 @@ plot(cv.clf1)
 
 
 clf2 <- train(Species~.,
-             data = iris,
-             trControl = trainControl("cv", 7),
-             method = "glmnet",
-             tuneLength = 20)
+              data = iris,
+              trControl = trainControl("cv", 7),
+              method = "glmnet",
+              tuneLength = 5)
 
 predict(clf2, iris, type="prob")
