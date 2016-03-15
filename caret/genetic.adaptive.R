@@ -34,8 +34,8 @@ set.seed(10)
 lev <- c("PS","WS")     # Set the levels
 
 system.time(rf_ga3 <- gafs(x = trainX, y = y,
-                           iters = 10, # 100 generations of algorithm
-                           popSize = 20, # population size for each generation
+                           iters = 50, # 100 generations of algorithm
+                           popSize = 60, # population size for each generation
                            levels = lev,
                            gafsControl = ga_ctrl))
 
