@@ -1,0 +1,15 @@
+Timer unit: 1e-06 s
+
+Total time: 0.421734 s
+File: /media/sf_host/home2/yannick2/github/Spikes/Python/_simulation.py
+Function: simulate at line 8
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     8                                           def simulate(iterations, n=10000):
+     9         1        93818  93818.0     22.2      s = step(iterations, n)
+    10         1       135031 135031.0     32.0      x = np.cumsum(s, axis=0)
+    11         1           31     31.0      0.0      bins = np.arange(-30, 30, 1)
+    12         1            4      4.0      0.0      y = np.vstack([np.histogram(x[i,:], bins)[0]
+    13         1       192847 192847.0     45.7                    for i in range(iterations)])
+    14         1            3      3.0      0.0      return y
