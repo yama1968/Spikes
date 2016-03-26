@@ -1,0 +1,11 @@
+Filename: /home2/yannick2/github/Spikes/Python/_simulation.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+     8     46.8 MiB      0.0 MiB   def simulate(iterations, n=10000):
+     9     89.5 MiB     42.8 MiB       s = step(iterations, n)
+    10    127.5 MiB     38.0 MiB       x = np.cumsum(s, axis=0)
+    11    127.5 MiB      0.0 MiB       bins = np.arange(-30, 30, 1)
+    12    127.5 MiB      0.0 MiB       y = np.vstack([np.histogram(x[i,:], bins)[0]
+    13    127.5 MiB      0.0 MiB                     for i in range(iterations)])
+    14    127.5 MiB      0.0 MiB       return y
