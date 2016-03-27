@@ -12,7 +12,7 @@ x = np.array([[pm.Normal("x%d_%d" % (k,i), mu=v_mus[i], tau=v_taus[k],
               for k in np.arange(nb_stateux)])
 
 mcmc = pm.MCMC([v_mus, v_sigmas, v_taus, x])
-mcmc.sample(5000,1000)
+mcmc.sample(20000,1000)
 
 mu_traces = [np.array(mcmc.trace('mu%d' % k)[:]) for k in np.arange(sample_length)]
 sigma_traces = [np.array(mcmc.trace("sigma%d" % i)[:]) for i in np.arange(nb_stateux)]
