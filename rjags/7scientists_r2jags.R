@@ -11,7 +11,7 @@ chains <- 4
 nodes <- 4
 
 system.time (m <- jags.parallel(
-    model.file = '7scientists2.bug',
+    model.file = '7scientists.bug',
     data = list('x' = x,
                 'n' = n),
     n.chains = chains,
