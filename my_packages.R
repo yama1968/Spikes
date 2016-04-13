@@ -15,7 +15,9 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "readr", "kohonen", "dummies", "maptools", "rgeos",
       "apcluster", "igraph", "MonetDB.R", "RODBC", "RJDBC",
       "mixtools", "tclust",
-      "Lahman", "VGAM", "RUnit")
+      "Lahman", "VGAM", "RUnit",
+      "devtools", "xgboost",
+      "R2jags")
 
 
 p <- p[ ! p %in% installed.packages()]
@@ -27,6 +29,9 @@ install.packages(p)
 # sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
 # sudo apt-get install jags
 # sudo apt-get install libiodbc2-dev
+#  sudo apt-get install libgsl0-dev gsl-bin libgeos-dev r-cran-rgl
+
+
 
 i.xgboost <- function () {
         require(devtools)
