@@ -17,7 +17,7 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "mixtools", "tclust",
       "Lahman", "VGAM", "RUnit",
       "devtools", "xgboost",
-      "R2jags")
+      "R2jags", "pROC")
 
 
 p <- p[ ! p %in% installed.packages()]
