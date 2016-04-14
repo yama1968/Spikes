@@ -13,6 +13,7 @@ iris.dl <- h2o.deeplearning(x=1:3,
                             l2=0.001,
                             hidden=c(20, 10, 2, 10, 20),
                             epochs=200,
+                            reproducible = True,
                             seed=1234)
 print(iris.dl)
 iris.anon <- as.data.frame(h2o.anomaly(iris.dl, iris.h2o))
@@ -34,4 +35,11 @@ qplot(DF.L3.C1, DF.L3.C2,
       data    = features,
       color   = label,
       main    = "C1 vs C2")
+
+####
+
+pred.h2o <- predict(dl, iris.h2o)
+
+(pred.h2o - iris.h2o[,1:3])^2/ as.h2o(iris$rmse)
+
 

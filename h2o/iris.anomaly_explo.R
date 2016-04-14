@@ -61,6 +61,7 @@ train.dl <- function(data       = iris.h2o,
 }
 
 # train.dl(hidden=c(10,20,10), l2=1e-3, max_w2=NULL)
-train.dl(hidden = c(10,20,10), l2 = NULL, max_w2 = 1)
-train.dl(hidden = c(20,2,20), l2 = 0.0001, max_w2 = NULL)
+dl <- train.dl(hidden = c(10,20,10), l2 = NULL, max_w2 = 1)
+#train.dl(hidden = c(20,2,20), l2 = 0.0001, max_w2 = NULL)
+
 
