@@ -10,9 +10,10 @@ iris.dl <- h2o.deeplearning(x=1:3,
                             training_frame=iris.h2o,
                             autoencoder=T,
                             activation="Tanh",
-                            l2=0.0001,
+                            l2=0.001,
                             hidden=c(20, 10, 2, 10, 20),
-                            epochs=200)
+                            epochs=200,
+                            seed=1234)
 print(iris.dl)
 iris.anon <- as.data.frame(h2o.anomaly(iris.dl, iris.h2o))
 

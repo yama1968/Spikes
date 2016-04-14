@@ -38,19 +38,23 @@ train.dl <- function(data       = iris.h2o,
                     size    = I(5),
                     alpha   = 0.5))
         
-        print(qplot(DF.L3.C1, DF.L3.C3,
-                    data    = features,
-                    color   = label,
-                    main    = "C1 vs C3",
-                    size    = I(5),
-                    alpha   = 0.5))
-        
-        print(qplot(DF.L3.C2, DF.L3.C3,
-                    data    = features,
-                    color   = label,
-                    main    = "C2 vs C3",
-                    size    = I(5),
-                    alpha   = 0.5))
+        if (hidden[2] >= 3){
+
+          print(qplot(DF.L3.C1, DF.L3.C3,
+                      data    = features,
+                      color   = label,
+                      main    = "C1 vs C3",
+                      size    = I(5),
+                      alpha   = 0.5))
+          
+          print(qplot(DF.L3.C2, DF.L3.C3,
+                      data    = features,
+                      color   = label,
+                      main    = "C2 vs C3",
+                      size    = I(5),
+                      alpha   = 0.5))
+          
+        }
     }
     
     iris.dl
@@ -58,4 +62,5 @@ train.dl <- function(data       = iris.h2o,
 
 # train.dl(hidden=c(10,20,10), l2=1e-3, max_w2=NULL)
 train.dl(hidden = c(10,20,10), l2 = NULL, max_w2 = 1)
+train.dl(hidden = c(20,2,20), l2 = 0.0001, max_w2 = NULL)
 
