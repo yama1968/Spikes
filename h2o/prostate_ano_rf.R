@@ -27,7 +27,7 @@ feature_names <- setdiff(names(prostate_df), outcome_name)
 set.seed(1234)
 rf_model <- randomForest(x=train_df[,feature_names],
                          y=as.factor(train_df[,outcome_name]),
-                         importance=TRUE, ntree=20, mtry = 3)
+                         importance=TRUE, ntree=200, mtry = 3)
 
 validate_predictions <- predict(rf_model, newdata=validate_df[,feature_names], type="prob")
 
@@ -74,7 +74,7 @@ train_df_auto <- train_df[err$Reconstruction.MSE < 0.1,]
 set.seed(1234)
 rf_model <- randomForest(x=train_df_auto[,feature_names],
                          y=as.factor(train_df_auto[,outcome_name]),
-                         importance=TRUE, ntree=20, mtry = 3)
+                         importance=TRUE, ntree=200, mtry = 3)
 
 validate_predictions_known <- predict(rf_model, newdata=validate_df[,feature_names], type="prob")
 
@@ -91,7 +91,7 @@ train_df_auto <- train_df[err$Reconstruction.MSE >= 0.1,]
 set.seed(1234)
 rf_model <- randomForest(x=train_df_auto[,feature_names],
                          y=as.factor(train_df_auto[,outcome_name]),
-                         importance=TRUE, ntree=20, mtry = 3)
+                         importance=TRUE, ntree=200, mtry = 3)
 
 validate_predictions_unknown <- predict(rf_model, newdata=validate_df[,feature_names], type="prob")
 auc_rf = roc(response=as.numeric(as.factor(validate_df[,outcome_name]))-1,
