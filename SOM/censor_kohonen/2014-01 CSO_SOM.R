@@ -188,6 +188,7 @@ if (small_areas){
 rm(cluster_details)
 
 # Finally map the areas and colour by cluster
-ggplot(mappoints) + aes(long, lat, group=group, fill=factor(cluster)) + geom_polygon()  + coord_equal() + scale_fill_manual(values = pretty_palette)
-#+ geom_path(colour="white", alpha=0.5, size=0.2) # if you want an outline
+ggplot(mappoints) + aes(long, lat, group=group, fill=factor(cluster)) + 
+  geom_polygon()  + coord_equal() + scale_fill_manual(values = pretty_palette)
+# + geom_path(colour="white", alpha=0.5, size=0.2) # if you want an outline
 
