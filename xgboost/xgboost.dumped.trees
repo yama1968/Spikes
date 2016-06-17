@@ -1,0 +1,14 @@
+booster[0]
+0:[f28<-1.00136e-05] yes=1,no=2,missing=1,gain=1001.1,cover=6513
+	1:[f55<-1.00136e-05] yes=3,no=4,missing=3,gain=290.334,cover=3698
+		3:leaf=0.42844,cover=3248
+		4:leaf=-0.427938,cover=450
+	2:[f108<-1.00136e-05] yes=5,no=6,missing=5,gain=50.2809,cover=2815
+		5:leaf=-0.485704,cover=2762
+		6:leaf=0.490741,cover=53
+booster[1]
+0:[f59<-1.00136e-05] yes=1,no=2,missing=1,gain=138.725,cover=6513
+	1:[f66<-1.00136e-05] yes=3,no=4,missing=3,gain=45.3024,cover=6355
+		3:leaf=0.0137908,cover=6280
+		4:leaf=0.790517,cover=75
+	2:leaf=-0.9226,cover=158

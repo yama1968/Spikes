@@ -31,6 +31,8 @@ install.packages(p)
 # sudo apt-get install libiodbc2-dev
 #  sudo apt-get install libgsl0-dev gsl-bin libgeos-dev r-cran-rgl
 
+library(devtools)
+install_github("ujjwalkarn/xda")
 
 
 i.xgboost <- function () {
@@ -68,4 +70,10 @@ i.bioclite <- function () {
     source("https://bioconductor.org/biocLite.R")
     biocLite("Rgraphviz")
 }
+
+
+source("https://bioconductor.org/biocLite.R")
+biocLite("pcaMethods")
+biocLite("multtest")
+
 
