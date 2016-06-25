@@ -1,0 +1,7 @@
+# bugs model for control group play
+
+model{
+       pos0    ~ dbin(p, n0)
+       p       ~ dunif(0, 1)
+       pos1    ~ dbin(p, n1)
+}
