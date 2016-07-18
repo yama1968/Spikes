@@ -17,7 +17,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "mixtools", "tclust",
       "Lahman", "VGAM", "RUnit",
       "devtools", "xgboost",
-      "R2jags", "pROC", "xkcd", "plotly")
+      "R2jags", "pROC", "xkcd", "plotly",
+      "choroplethr", "choroplethrMaps", "dummies", "rio")
 
 
 p <- p[ ! p %in% installed.packages()]
@@ -30,6 +31,7 @@ install.packages(p)
 # sudo apt-get install jags
 # sudo apt-get install libiodbc2-dev
 #  sudo apt-get install libgsl0-dev gsl-bin libgeos-dev r-cran-rgl
+# sudo apt-get install libxml2-dev
 
 library(devtools)
 install_github("ujjwalkarn/xda")
