@@ -18,7 +18,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "Lahman", "VGAM", "RUnit",
       "devtools", "xgboost",
       "R2jags", "pROC", "xkcd", "plotly",
-      "choroplethr", "choroplethrMaps", "dummies", "rio")
+      "choroplethr", "choroplethrMaps", "dummies", "rio",
+      "dendextend", "rafalib")
 
 
 p <- p[ ! p %in% installed.packages()]
@@ -77,5 +78,8 @@ i.bioclite <- function () {
 source("https://bioconductor.org/biocLite.R")
 biocLite("pcaMethods")
 biocLite("multtest")
-
-
+biocLite(c("Biobase", "org.Hs.eg.db", "AnnotationDbi"))
+biocLite("alyssafrazee/RSkittleBrewer")
+biocLite("GenomicRanges")
+biocLite("SummarizedExperiment")
+biocLite("DESeq2")
