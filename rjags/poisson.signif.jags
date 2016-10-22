@@ -1,0 +1,10 @@
+# bugs model for control group play
+
+model{
+       for (i in 1:n) {
+           x[i]   ~ dpois(mu)
+       }
+       mu         ~ dunif(1, 200000)
+       
+       rep.x      ~ dpois(mu)
+}
