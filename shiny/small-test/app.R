@@ -22,6 +22,9 @@ server <- function(input, output) {
 }
 
 ui <- fluidPage(
+  tags$h1("Big histogram"),
+  tags$p("Inspired by",
+        tags$a(href = "http://shiny.rstudio.com/tutorial/", "the shiny tutorial.")),
   sliderInput(inputId = "num",
               label = "Choose a number of samples",
               value = 500, min = 1, max = 50000),
