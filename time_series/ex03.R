@@ -5,6 +5,7 @@ library(reshape)
 library(ggplot2)
 
 www <- "http://staff.elena.aut.ac.nz/Paul-Cowpertwait/ts/ApprovActiv.dat"
+www <- "https://github.com/burakbayramli/kod/raw/master/books/Introductory_Time_Series_with_R_Metcalfe/ApprovActiv.dat"
 Build.dat <- read.table(www, header=T)
 attach(Build.dat)
 App.ts <-ts(Approvals, start=c(1996,1), freq=4)
