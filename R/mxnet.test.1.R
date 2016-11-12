@@ -18,9 +18,11 @@ test.x = data.matrix(Sonar[-train.ind, 1:60])
 test.y = Sonar[-train.ind, 61]
 
 mx.set.seed(0)
+
+device <- mx.gpu()
 model <- mx.mlp(train.x, train.y, hidden_node=10, out_node=2, out_activation="softmax",
-                num.round=20, array.batch.size=15, learning.rate=0.07, momentum=0.9, 
-                eval.metric=mx.metric.accuracy)
+                num.round=20, array.batch.size=15, learning.rate=0.07, momentum=0.9,
+                eval.metric=mx.metric.accuracy, device = device)
 
 preds = predict(model, test.x)
 pred.label = max.col(t(preds))-1
