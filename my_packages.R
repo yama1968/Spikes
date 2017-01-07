@@ -20,7 +20,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "R2jags", "pROC", "xkcd", "plotly",
       "choroplethr", "choroplethrMaps", "dummies", "rio",
       "dendextend", "rafalib",
-      "gridExtra")
+      "gridExtra", "ergm", "DT", "pryr",
+      "shinydashboard", "visNetwork", "drat")
 
 
 p <- p[ ! p %in% installed.packages()]
