@@ -1,6 +1,8 @@
 ---
 title: "Location history"
-output: html_notebook
+output:
+  html_notebook: default
+  pdf_document: default
 ---
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
@@ -9,6 +11,8 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 ```{r}
 library(jsonlite)
+library(plotly)
+
 system.time(x <- fromJSON("~/tmp/Historiquedespositions.json"))
 ```
 
@@ -151,7 +155,7 @@ but there are still many data points with a high inaccuracy.
 
 Plotting on map
 ```{r}
-germany <- get_map(location = 'France', zoom = 5)
+germany <- get_map(location = 'France', zoom = 6)
 
 ggmap(germany) + geom_point(data = loc, aes(x = lon, y = lat), alpha = 0.5, color = "red") + 
   theme(legend.position = "right") + 
@@ -164,7 +168,7 @@ ggmap(germany) + geom_point(data = loc, aes(x = lon, y = lat), alpha = 0.5, colo
 
 Close to Versailles
 ```{r}
-munster <- get_map(location = 'Versailles', zoom = 12)
+munster <- get_map(location = 'Viroflay', zoom = 10)
 
 options(stringsAsFactors = T)
 ggmap(munster) + 
@@ -199,7 +203,7 @@ ggmap(munster) + geom_point(data = loc_2, aes(x = lon, y = lat, color = velocity
 What distance?
 ```{r}
 
-loc3 <- subset(loc, loc$time < as.POSIXct('2016-10-01 0:00:01'))
+loc3 <- subset(loc, loc$time > as.POSIXct('2016-01-01 0:00:01'))
 
 # Shifting vectors for latitude and longitude to include end position
 shift.vec <- function(vec, shift){
@@ -216,6 +220,9 @@ shift.vec <- function(vec, shift){
 
 loc3$lat.p1 <- shift.vec(loc3$lat, -1)
 loc3$lon.p1 <- shift.vec(loc3$lon, -1)
+loc3$time.p1 <- shift.vec(loc3$time, -1)
+loc3$time.to.prev <- as.numeric(loc3$time - loc3$time.p1, units = "secs")
+
 
 # Calculating distances between points (in metres) with the function pointDistance from the 'raster' package.
 library(raster)
@@ -225,6 +232,11 @@ loc3$dist.to.prev <- apply(loc3, 1, FUN = function(row) {
                 c(as.numeric(as.character(row["lat"])), as.numeric(as.character(row["lon"]))),
                 lonlat = T) # Parameter 'lonlat' has to be TRUE!
 })
+
+loc4 <- subset(loc3, loc3$time.to.prev > 0)
+loc4$speed <- loc4$dist.to.prev / loc4$time.to.prev
+
+loc3 <- subset(loc4, loc4$speed < 50)
 ```
 Distance in km
 
@@ -281,7 +293,22 @@ ggplot(activities_2, aes(x = main_activity, group = main_activity, fill = main_a
     only the activity with highest likelihood were chosen for each position."
   )
 ```
+Removing still!
 
+```{r}
+ggplot(subset(activities_2, main_activity != "still"), aes(x = main_activity, group = main_activity, fill = main_activity)) + 
+  geom_bar()  + 
+  guides(fill = FALSE) +
+  my_theme() +
+  labs(
+    x = "",
+    y = "Count",
+    title = "Main activities in 2016",
+    caption = "Associated activity for recorded positions in 2016. 
+    Because Google records activity probabilities for each position, 
+    only the activity with highest likelihood were chosen for each position."
+  )
+```
 
 ```{r}
 sessionInfo()
