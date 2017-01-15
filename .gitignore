@@ -50,3 +50,4 @@ fb_oauth
 *.pdf
 location.history*/*
 *.nb.html
+.stan/
