@@ -1,0 +1,589 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Beginners Exercise: Bayesian computation with Stan and Farmer Jöns"
+*Rasmus Bååth*
+
+Here follows a number of data analytic questions. Use [Stan](http://mc-stan.org/) and [R](http://www.r-project.org/) to build models that probe these questions. The Stan documentation can be found here: http://mc-stan.org/documentation/ . You can find the answers to the exercise questions [here](http://www.sumsar.net/files/posts/2017-01-15-bayesian-computation-with-stan-and-farmer-jons/stan_exercise_answers.html)
+
+
+1. Getting started
+----------------------
+
+Below is a code scaffold you can copy-n-paste into R. Right now the scaffold contains a simple model for two binomial rates, but this should be replaced with a model that matches the relevant questions. 
+
+**→ Read through the code to see if you can figure out what does what and then run it to make sure it works. It should print out some statistics and some pretty graphs.**
+
+```{r results='hide', fig.keep='none', warning=FALSE, message=FALSE}
+library(rstan)
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
+# The Stan model as a string.
+model_string <- "
+data {
+  # Number of data points
+  int n1;
+  int n2;
+  # Number of successes
+  int y1[n1];
+  int y2[n2];
+}
+
+parameters {
+  real<lower=0, upper=1> theta1;
+  real<lower=0, upper=1> theta2;
+}
+
+model {  
+  theta1 ~ beta(1, 1);
+  theta2 ~ beta(1, 1);
+  y1 ~ bernoulli(theta1);
+  y2 ~ bernoulli(theta2); 
+}
+
+generated quantities {
+}
+"
+
+y1 <- c(0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+y2 <- c(0, 0, 1, 1, 1, 0, 1, 1, 1, 0)
+data_list <- list(y1 = y1, y2 = y2, n1 = length(y1), n2 = length(y2))
+
+# Compiling and producing posterior samples from the model.
+stan_samples <- stan(model_code = model_string, data = data_list)
+
+# Plotting and summarizing the posterior distribution
+stan_samples
+plot(stan_samples)
+```
+
+**Hint 1:** `bernoulli` is the Bernoulli distribution which is the special case of the binomial distribution when there is just one trial (`bernoulli(x) === binomial(1, x)`). That is, if the data is coded as 4 successes out of 6 (`x = 4; n = 6`) it would be most convenient to use a binomial distribution. If the data is coded like `c(1, 1, 1, 1, 0, 0)` it would be more convenient to use a Bernoulli distribution. The result would in any case be the same.
+
+**Hint 2:** Stan has quite a lot of different built in data types and two that sounds the same, but arn't, are vectors and arrays. Vectors are simple, they are lists of real numbers and `vector[4] v;` would define a vector or length 4. Arrays are more general in that they can contain other data types, for example `int a[4]` would define an array of integers of length 4. Note the different placement of the `[]`-brackets compared to defining a vector.
+
+**Hint 3:** When defining parameters it's important to properly define the *support*, that is, for what values the parameter has a defined meaning. For example, the support of a mean is on the whole real line (-Inf to Inf) so that can simply be declared by `real mu;`. A *standard deviation*, on the other hand, can't be below 0.0, which could be written like this: `real<lower=0> sigma`. Finaly, a *rate* has to be between 0 and 1 which would be written like `real<lower=0, upper=1> theta;`
+
+2. Manipulating samples
+-------------------------
+
+ To inspect and manipulate samples from individual parameters it is useful to convert the Stan "object" into a simple data.frame which gets one column per parameter:
+
+```{r}
+s <- as.data.frame(stan_samples)
+head(s)
+```
+
+This is useful as you can, for example, plot and compare the individual parameters.
+
+```{r}
+
+library(ggplot2)
+
+# The probability that the rate theta1 is smaller than theta2
+mean(s$theta1 < s$theta2)
+# The above is a short cut for sum(s$theta1 < s$theta2) / nrow(s)
+```
+```{r}
+
+# Plotting distribution of the difference between theta1 and theta2
+qplot(s$theta2 - s$theta1, geom = "histogram", bins = 20)
+```
+
+**→ Calculate the probability that the difference between the two underlying rates is smaller than 0.2.**
+
+**Hint:**  `abs(x - y)` calculates the absolute difference between x and y.
+
+```{r}
+print(mean(abs(s$theta1 - s$theta2) < 0.2))
+```
+
+
+3. Cows and disease
+-------------------------
+
+Farmer Jöns has a huge number of cows. Earlier this year he ran an experiment where he gave 10 cows medicine A and 10 medicine B and then measured whether they got sick (`0`) or not (`1`) during the summer season. Here is the resulting data:
+
+```{r}
+cowA <- c(0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+cowB <- c(0, 0, 1, 1, 1, 0, 1, 1, 1, 0)
+```
+
+**→ Jöns now wants to know: How effective are the drugs? What is the evidence that medicine A is better or worse than medicine B?**
+
+```{r}
+print(mean(s$theta1 < s$theta2))
+```
+
+4. Cows and milk
+-------------------------
+
+Farmer Jöns has a huge number of cows. Earlier this year he ran an experiment where he gave 10 cows a special diet that he had heard could make them produce more milk. He recorded the number of liters of milk from these "diet" cows and from 15 "normal" cows during one month. This is the data:
+
+```{r}
+diet_milk <- c(651, 679, 374, 601, 401, 609, 767, 709, 704, 679)
+normal_milk <- c(798, 1139, 529, 609, 553, 743, 151, 544, 488, 555, 257, 692, 678, 675, 538)
+```
+
+**→ Jöns now wants to know: Was the diet any good, does it results in better milk production?**
+
+**Hint 1:** To model this you might find it useful to use the Normal distribution which is called `normal` in Stan. A statement using `normal` could look like: 
+
+```
+for(i in 1:n ) {
+  y[i] ~ normal(mu, sigma);
+}
+```
+
+Where `mu` is the mean and `sigma` is the standard deviation and `y` is a vector of length `n`. Since Stan is partly vectorized the above could also be written without the loop like `y ~ normal(mu, sigma);`.
+
+**Hint 2:** You will have to put priors on `mu` and `sigma` and here there are many options. A lazy but often OK shortcut is to just use `uniform` distributions that are wide enough to include all thinkable values of the parameters. If you want to be extra sloppy you can actually skip putting any priors at all in which case Stan will use uniform(-Infinity, Infinity), but it's good style to use explicit priors.
+
+```{r}
+milk_string <- "
+data {
+  # nomber of data points
+  int n1;
+  int n2;
+  # number of successes
+  int m1[n1];
+  int m2[n2];
+}
+
+parameters {
+  real<lower=0> mu1;
+  real<lower=0> mu2;
+  real<lower=0> sigma1;
+  real<lower=0> sigma2;
+}
+
+model {
+  mu1           ~ uniform(0, 2000);
+  mu2           ~ uniform(0, 2000);
+  sigma1        ~ uniform(0, 2000);
+  sigma2        ~ uniform(0, 2000);
+
+  for (i in 1:n1) {
+    m1[i]       ~ normal(mu1, sigma1);
+  }
+  for (i in 1:n2) {
+    m2[i]       ~ normal(mu2, sigma2);
+  }
+}
+
+generated quantities {
+}
+"
+
+milk_samples <- stan(model_code = milk_string,
+                     data       = list(m1 = diet_milk,
+                                       m2 = normal_milk,
+                                       n1 = length(diet_milk),
+                                       n2 = length(normal_milk)),
+                     iter       = 10000,
+                     thin       = 2,
+                     cores      = 4,
+                     chains     = 8)
+print(milk_samples)
+milk_s <- as.data.frame(milk_samples)
+
+```
+
+```{r}
+plot(milk_samples)
+```
+
+
+```{r}
+print(mean(milk_s$mu1 > milk_s$mu2))
+```
+
+
+<br/><br/><br/>
+
+*If you have made it this far, great! Below are a couple of bonus questions. How far can you reach?*
+-----------------------------------
+
+5. Cows and Mutant Cows
+-------------------------
+
+Farmer Jöns has a huge number of cows. Due to a recent radioactive leak in a nearby power plant he fears that some of them have become *mutant cows*. Jöns is interested in measuring the effectiveness of a diet on normal cows, but not on mutant cows (that might produce excessive amounts of milk, or nearly no milk at all!). The following data set contains the amount of milk for cows on a diet and cows on normal diet:
+
+
+```{r}
+diet_milk <- c(651, 679, 374, 601, 4000, 401, 609, 767, 3890, 704, 679)
+normal_milk <- c(798, 1139, 529, 609, 553, 743, 3,151, 544, 488, 15, 257, 692, 678, 675, 538)
+```
+Some of the data points might come from mutant cows (aka outliers).
+
+**→ Jöns now wants to know: Was the diet any good, does it results in better milk production for non-mutant cows?**
+
+**Hint:** Basically we have an outlier problem. A conventional trick in this situation is to supplement the normal distribution for a distribution with wider tails that is more sensitive to the central values and disregards the far away values (this is a little bit like trimming away some amount of the data on the left and on the right). A good choice for such a distribution is the t-distribution which is like the normal but with a third parameter called the "degrees of freedom". The lower the "degrees of freedom" the wider the tails and when this parameter is larger than about 50 the t-distribution is practically the same as the normal. A good choice for the problem with the mutant cows would be to use a t distribution with around 3 degrees of freedom:
+
+```
+y ~ student_t(3, mu, sigma);
+```
+Of course, you could also estimate the "degrees of freedom" as a free parameter, but that might be overkill in this case...
+
+```{r}
+
+mutant_string <- "
+data {
+  # nomber of data points
+  int n1;
+  int n2;
+  # number of successes
+  int m1[n1];
+  int m2[n2];
+}
+
+parameters {
+  real<lower=0> mu1;
+  real<lower=0> mu2;
+  real<lower=0> sigma1;
+  real<lower=0> sigma2;
+}
+
+model {
+  mu1           ~ uniform(0, 2000);
+  mu2           ~ uniform(0, 2000);
+  sigma1        ~ uniform(0, 2000);
+  sigma2        ~ uniform(0, 2000);
+
+  for (i in 1:n1) {
+    m1[i]       ~ student_t(3, mu1, sigma1);
+  }
+  for (i in 1:n2) {
+    m2[i]       ~ student_t(3, mu2, sigma2);
+  }
+}
+
+generated quantities {
+}
+"
+
+diet_milk <- c(651, 679, 374, 601, 4000, 401, 609, 767, 3890, 704, 679)
+normal_milk <- c(798, 1139, 529, 609, 553, 743, 3,151, 544, 488, 15, 257, 692, 678, 675, 538)
+
+mutant_samples <- stan(model_code = mutant_string,
+                     data       = list(m1 = diet_milk,
+                                       m2 = normal_milk,
+                                       n1 = length(diet_milk),
+                                       n2 = length(normal_milk)),
+                     iter       = 10000,
+                     thin       = 2,
+                     cores      = 4,
+                     chains     = 8)
+print(mutant_samples)
+
+```
+
+```{r}
+mutant_s <- as.data.frame(mutant_samples)
+
+print(mean(mutant_s$mu1 > mutant_s$mu2))
+```
+
+```{r}
+qplot(mutant_s$mu1 - mutant_s$mu2, geom = "histogram", bins = 20)
+```
+
+
+6. Chickens and diet
+-------------------------
+
+Farmer Jöns has a huge number of cows. He also has chickens. He tries different diets on them too with the hope that they will produce more eggs. Below is the number of eggs produced in one week by chickens on a diet and chickens eating normal chicken stuff:
+
+```{r}
+diet_eggs <- c(6, 4, 2, 3, 4, 3, 0, 4, 0, 6, 3)
+normal_eggs <- c(4, 2, 1, 1, 2, 1, 2, 1, 3, 2, 1)
+```
+
+**→ Jöns now wants to know: Was the diet any good, does it result in the chickens producing more eggs?**
+
+**Hint:** The Poisson distribution is a discrete distribution that is often a reasonable choice when one wants to model count data (like, for example, counts of eggs). The Poisson has one parameter $\lambda$ which stands for the mean count. In Stan you would use the Poisson like this:
+
+```
+  y ~ poisson(lambda);
+```
+
+where y would be a single integer or an integer array of length `n` ( defined like `int y[n];`) and `lambda` a real number bounded at 0.0 (`real<lower=0> lambda;`) 
+```{r}
+
+eggs_string <- "
+data {
+  # nomber of data points
+  int n1;
+  int n2;
+  # number of eggs
+  int e1[n1];
+  int e2[n2];
+}
+
+parameters {
+  real<lower=0> lambda1;
+  real<lower=0> lambda2;
+}
+
+model {
+  lambda1       ~ uniform(0, 20);
+  lambda2       ~ uniform(0, 20);
+
+  for (i in 1:n1) {
+    e1[i]       ~ poisson(lambda1);
+  }
+  for (i in 1:n2) {
+    e2[i]       ~ poisson(lambda2);
+  }
+}
+
+generated quantities {
+}
+"
+
+eggs_samples <- stan(model_code = eggs_string,
+                     data       = list(e1 = diet_eggs,
+                                       e2 = normal_eggs,
+                                       n1 = length(diet_eggs),
+                                       n2 = length(normal_eggs)),
+                     iter       = 10000,
+                     thin       = 2,
+                     cores      = 4,
+                     chains     = 8)
+print(eggs_samples)
+```
+
+```{r}
+plot(eggs_samples)
+```
+
+
+```{r}
+e <- as.data.frame(eggs_samples)
+
+qplot(e$lambda1 - e$lambda2, geom = "histogram", bins = 20)
+```
+
+```{r}
+print(mean(e$lambda1 - e$lambda2 > 1))
+```
+
+
+7. Cows and milk in a different data format
+-------------------------
+It's often common to have all data in a data frame / table. Copy-n-paste the following into R and inspect the resulting data frame `d`.
+
+```{r}
+d <- data.frame(
+  milk = c(651, 679, 374, 601, 401, 609, 767, 709, 704, 679, 798, 1139,
+           529, 609, 553, 743, 151, 544, 488, 555, 257, 692, 678, 675, 538),
+  group = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2))
+
+```
+
+Looking at `d` you should see that it contains the same data as in exercise (4) but coded with one cow per row (The mutant cows were perhaps just a dream...). The diet group is coded as a 1 and the normal group is coded as a 2. This data could be read into Stan by using the following data list:
+
+```{r}
+data_list <- list(y = d$milk, x = d$group, n = length(d$milk), 
+                  n_groups = max(d$group))
+```
+
+**→ Modify the model from (4) to work with this data format instead.**
+
+**Hint:** In your Stan code you can loop over the group variable and use it to pick out the parameters belonging to that group like this:
+
+```
+for(i in 1:n) {
+  y[i] ~ normal( mu[x[i]], sigma[x[i]] ) 
+}
+```
+
+Where `mu` and `sigma` now are 2-length vectors. This is also known as *indexception*: You use an index (`i`) to pick out an index (`x[i]`) to pick out a value (` mu[x[i]]`). As indexing is vectorised in Stan this can actually be shortened to just:
+
+```
+y ~ normal( mu[x], sigma[x] );
+```
+
+8. Cows and more diets
+-------------------------
+
+Farmer Jöns has a huge number of cows. He also has a huge number of different diets he wants to try. In addition to the diet he already tried, he tries another diet (let's call it diet 2) on 10 more cows.  Copy-n-paste the following into R and inspect the resulting data frame `d`. 
+
+```{r}
+d <- data.frame(
+  milk = c(651, 679, 374, 601, 401, 609, 767, 709, 704, 679, 798, 1139, 529,
+           609, 553, 743, 151, 544, 488, 555, 257, 692, 678, 675, 538, 1061,
+           721, 595, 784, 877, 562, 800, 684, 741, 516),
+  group = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3))
+```
+
+It contains the same data as in the last exercise but with 10 added rows for diet 2 which is coded as group = 3.
+
+**→ Now Jöns now wants to know: Which diet seems best, if any? How much more milk should he be expecting to produce using the best diet compared to the others?**
+
+**Hint:** If you looped or used vecotrization in a smart way you should be able to use the same model as in Question 7.
+
+
+
+9. Cows and sunshine
+-------------------------
+
+Farmer Jöns has a huge number of cows. He is wondering whether the amount of time a cow spends outside in the sunshine affects how much milk she produces. To test this he makes a controlled experiment where he picks out 20 cows and assigns each a number of hours she should spend outside each day. The experiment runs for a month and Jöns records the number of liters of milk each cow produces. Copy-n-paste the following into R and inspect the resulting data frame `d`. 
+
+```{r}
+d <- data.frame(milk = c(685, 691, 476, 1151, 879, 725, 1190, 1107, 809, 539,
+                         298, 805, 820, 498, 1026, 1217, 1177, 684, 1061, 834),
+                hours = c(3, 7, 6, 10, 6, 5, 10, 11, 9, 3, 6, 6, 3, 5, 8, 11, 
+                          12, 9, 5, 5))
+```
+
+**→ Using this data on hours of sunshine and resulting liters of milk Jöns wants to know: Does sunshine affect milk production positively or negatively?**
+
+**Hint 1:** A model probing the question above requires quite small changes to the model you developed in Question 8.
+
+**Hint 2:** You do remember the equation for the (linear regression) line? If not, here it is: `mu = beta0 + beta1 * x;`
+
+<!--
+
+I'm not including these excersises for the time being, there are plenty of excersises as there are.
+
+Pro-level exercises
+---------------------
+
+I don't count on anybody getting this far during the tutorial, but if you have: Congratulations! Here follows three pro-level exercises that will take you through multilevel regression, hierarchical linear models (sometimes called Mixed-effects models), and psychophysical modeling using logistic regression (yeah!). 
+
+10. Different cows and sunshine
+-------------------------
+
+Farmer Jöns has a huge number of cows and he knows that all cows are not the same. Therefore he wants to test if it could be the case that some cows produce more milk when allowed to be outside in the sun while for other cows sunshine  might not matter that much for the milk production. He therefore selects four cows and for each cow varies the number of hours she spends outside each day, changing this number each month. The experiment runs for eight months yielding eight datapoints per cow. Copy-n-paste the following into R and inspect the resulting data frame `d`. 
+
+
+```{r echo=F, eval = FALSE}
+set.seed(123)
+n = 4
+months = 8
+hours <- round(seq(2, 12, length.out=months))
+beta_0 = 600
+beta_1 = rnorm(n, 40, 30)
+d <- data.frame(cow = round(rep(1:n, each=months)), beta_0, beta_1 = rep(beta_1, each=months), hours=hours)
+d$milk <- round(rnorm(nrow(d), d$beta_0 + d$beta_1 * d$hours, 200))
+#dput(d[, c("cow","hours", "milk")])
+#qplot(hours, milk, facets = cow ~ ., geom="line", data=d)
+```
+
+```{r, eval = FALSE}
+d <- 
+  structure(list(cow = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 
+2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4), hours = c(2, 
+3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 
+8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12), milk = c(672, 1013, 
+808, 486, 648, 720, 1100, 950, 746, 721, 654, 1156, 964, 505, 
+1104, 903, 560, 817, 829, 975, 1169, 1044, 1722, 1672, 457, 977, 
+896, 794, 1116, 1155, 1228, 1243)), .Names = c("cow", "hours", 
+"milk"), class = "data.frame", row.names = c(NA, -32L))
+```
+
+**→ Jöns wants to know: Does it seem like the four cows react in the same way to increased amounts of sunshine? Or is sunshine more beneficial to some cows (or rather, to some cows' milk production) than other?**
+
+**Hint:** This is a straight forward extension of the model from the last exercise (9). You just need to add some more loop magic similar to that in exercise (8).
+
+11. Multilevel cows and sunshine
+-------------------------
+
+Farmer Jöns has a huge number of cows and unlimited time to run experiments on them it seems... Jöns continued the study from last exercise (10) and collected data on ten new cows. Copy-n-paste the following into R and inspect the resulting data frame `d`. 
+
+```{r echo=F, eval = FALSE}
+set.seed(123)
+n = 10
+months = 8
+hours <- round(seq(2, 12, length.out=months))
+beta_0 = 600
+beta_1 = rnorm(n, 40, 30)
+d <- data.frame(cow = round(rep(1:n, each=months)), beta_0, beta_1 = rep(beta_1, each=months), hours=hours)
+d$milk <- round(rnorm(nrow(d), d$beta_0 + d$beta_1 * d$hours, 200))
+#dput(d[, c("cow","hours", "milk")])
+#qplot(hours, milk, facets = cow ~ ., geom="line", data=d)
+```
+
+```{r, eval = FALSE}
+d <- 
+  structure(list(cow = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 
+2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 
+5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 
+7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 
+10, 10, 10, 10, 10), hours = c(2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 
+5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 
+9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12, 
+2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12, 2, 3, 5, 
+6, 8, 9, 11, 12, 2, 3, 5, 6, 8, 9, 11, 12), milk = c(891, 742, 
+796, 761, 674, 1166, 955, 485, 806, 605, 552, 755, 660, 752, 
+839, 660, 941, 891, 806, 1371, 1379, 1322, 1733, 1817, 849, 864, 
+921, 840, 876, 903, 924, 1064, 435, 1165, 1061, 639, 870, 902, 
+1239, 1110, 834, 869, 1049, 1422, 1286, 1726, 1296, 1814, 732, 
+805, 945, 823, 964, 881, 978, 1307, 694, 617, 795, 1022, 518, 
+157, 824, 483, 501, 863, 640, 472, 791, 747, 814, 910, 579, 809, 
+689, 826, 1032, 927, 828, 1149)), .Names = c("cow", "hours", 
+"milk"), class = "data.frame", row.names = c(NA, -80L))
+```
+
+And while you are at it, why not take a look at the data by running the following command (assuming you have the ggplot2 package installed.)
+
+```{r eval=FALSE, eval = FALSE}
+library(ggplot2)
+qplot(hours, milk, facets = ~ cow, geom="line", data=d, ylim=c(0, 2000))
+```
+
+**→ Jöns wants to know: "While I just measured ten cows, what would be an estimate of the effect of sunshine on all my cows and roughly how much would the effect of sunshine vary from cow to cow?"**
+
+**Hint:**
+What Jöns is asking you to do is not just estimate the distribution of the data but in addition estimate the distribution of the regression parameters for the effect of sunshine on the different cows. While you might not know much about how this parameter might be distributed a reasonable starting point would be to assume a normal distribution. Some cows are more positively affected by sunshine and some cows are more goth...
+
+**Fun fact:**
+The model you've most probably will developed will be identical to that resulting from the following call to [`lmer`](http://cran.r-project.org/web/packages/lme4/index.html).
+
+```{r eval=FALSE, eval = FALSE}
+fit <- lmer(milk ~ 1 + hours + (1 + hours | cow), data=d)
+summary(fit)
+```
+
+The results will also be identical iff you use the same priors as ´lmer´ (within approximation error).
+
+12. Cows and light intensity discrimination
+===============================================
+
+Farmer Jöns has a huge number of cows. He also has a huge interest in the light intensity discrimination abilities of cows. He therefore performs an experiment on one of his favorite cows, Blenda. In 90 trials Jöns shows Blenda two led-lights, one that always has the same intensity (the "standard" at an intensity of 10) and one with different intensity in different trials (the "test" ranging from 6-14). In each trial Blenda has to indicate in a 2-forced-choice-task which light source she experiences as the most bright.  Copy-n-paste the following into R and inspect the resulting data frame `d`. 
+
+```{r, eval = FALSE}
+d <- 
+  structure(list(test_intensity = c(6, 6, 6, 6, 6, 6, 6, 6, 6, 
+6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 
+10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 
+12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 
+14, 14, 14, 14, 14, 14, 14, 14, 14, 14), choice = c(0, 0, 1, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 
+0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 0)), .Names = c("test_intensity", "choice"), row.names = c(NA, 
+-90L), class = "data.frame")
+```
+
+In `d` `test_intensity` shows the intensity of the test stimulus and `choice` show the choice of Blenda where the choice of the standard is coded as 0 and the choice of the test is coded as 1.
+
+**→ Help Jöns fit a psychometric function to the choice data!**
+
+**Hint:** If $\theta$ is a probability then the log odds $x$ of theta is defined as:
+
+$$x = log(\frac{\theta}{1 - \theta}) $$
+
+The conversion the other way (which is probably what you want in your JAGS model) is:
+
+$$\theta = \frac{1}{1 + exp(-x)} $$
+
+-->
