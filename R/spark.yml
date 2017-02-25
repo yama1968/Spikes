@@ -1,3 +1,5 @@
 default:
   sparklyr.cores.local: 8
   sparklyr.shell.driver-memory: 12G
+  spark.local.dir: /home/yannick/tmp/sparklyr
+  spark.rdd.compress: true

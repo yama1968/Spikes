@@ -1,4 +1,4 @@
-#
+
 
 library(sparklyr)
 library(dplyr)
@@ -10,8 +10,8 @@ system.time(df1 <- spark_read_csv(sc, name = "train10k", path = "/home/yannick/t
 system.time(foo <- df1 %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
 foo
 
-system.time(df <- spark_read_csv(sc, name = "train", path = "/home/yannick/tmp/train.csv", repartition = 4, memory = TRUE, overwrite = TRUE))
-# 250 sec
+system.time(df <- spark_read_csv(sc, name = "train", path = "/home/yannick/tmp/train.csv", repartition = 8, memory = T, overwrite = TRUE))
+# 250 sec => 146 sec with 8 repartition
 
 system.time(foo <- df %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
 # 1.2 sec!!!
@@ -77,18 +77,19 @@ device_plus_dt <- train3 %>%
   mutate(dt_hour = int_hour - lag(int_hour)) %>%
   ungroup()
 
-device_plus_dt %>%
+system.time(device_plus_dt %>%
   filter(is.null(dt_hour)) %>%
-  count()
-# crash on 1.6!!!
+  count())
+# crash on 1.6..
+# 44 sec on 2.1
 
 system.time(
 dt_per_day <- device_plus_dt %>%
-  select(!is.null(dt_hour)) %>%
+  filter(!is.null(dt_hour)) %>%
   group_by(int_day) %>%
   summarise(sum_dt_hour = sum(dt_hour),
             num_per_day = count(),
-            avg_per_day = sum(dt_hour) / count(dt_hour)) %>%
+            avg_per_day = sum(dt_hour) / count()) %>%
   arrange(int_day) %>%
   collect
 )
