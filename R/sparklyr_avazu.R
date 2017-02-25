@@ -13,6 +13,8 @@ foo
 system.time(df <- spark_read_csv(sc, name = "train", path = "/home/yannick/tmp/train.csv", repartition = 8, memory = T, overwrite = TRUE))
 # 250 sec => 146 sec with 8 repartition
 
+spark_write_parquet(df, "hdfs://user/yannick/train.parquet")
+
 system.time(foo <- df %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
 # 1.2 sec!!!
 foo
@@ -94,6 +96,28 @@ dt_per_day <- device_plus_dt %>%
   collect
 )
 dt_per_day
+
+
+# join01
+
+device_id_nb_tmp <- df %>%
+  group_by(device_id) %>%
+  summarise(nnb = count(), p = avg(click))
+
+
+foo <- train_features <- device_id_nb_tmp %>%
+  inner_join(df, on = "device_id") %>%
+  group_by(click) %>%
+  summarise(cnt = count())
+
+foo %>% explain
+
+system.time( bar <- foo %>%
+               collect )
+#
+bar
+
+
 
 
 
