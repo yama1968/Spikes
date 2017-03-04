@@ -51,4 +51,4 @@ fb_oauth
 location.history*/*
 *.nb.html
 .stan/
-target/*
+target/
