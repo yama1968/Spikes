@@ -19,3 +19,4 @@ inspect compile
 inspect run
 inspect coucou
 exit
+run

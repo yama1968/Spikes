@@ -50,7 +50,7 @@ DECLARE MarginOfError decimal(10,5);
 
  CREATE FUNCTION TotalNodeCount()
 RETURNS int
-  BEGIN 
+  BEGIN
         RETURN select count(*) from Nodes;
    END;
 
@@ -64,7 +64,7 @@ RETURNS int
     END;
 
 update Nodes
-set 
+set
 	NodeCount = is_null(x.TargetNodeCount,TotalNodeCount()), --store the number of edges each node has pointing away from it.
 	-- if a node has 0 edges going away (it's a sink), then its number is the total number of edges in the system.
 	HasConverged = false
@@ -99,59 +99,40 @@ DECLARE foo int;
     END;
 
 
- CREATE VIEW nodes_x
- AS
- 	-- Compute the PageRank each target node by the sum
-		-- of the nodes' weights that point to it.
-		SELECT
-			e.TargetNodeId
-			,sum(n2.NodeWeight / n2.NodeCount) * DampingFactor AS TransferredNodeWeight
-		FROM Nodes n2
-		INNER JOIN Edges e
-		  ON n2.NodeId = e.SourceNodeId
-		WHERE e.SourceNodeId <> e.TargetNodeId --self references are ignored
-		GROUP BY e.TargetNodeId;
 
-
- CREATE PROCEDURE PG()
+ CREATE PROCEDURE pgstep()
 BEGIN
-WHILE EXISTS
-(
-	SELECT true
-	FROM Nodes
-	WHERE HasConverged = 0
-)
-DO
 	CREATE TABLE Nodes_prime
-	AS SELECT
-		n.NodeId,
-		case
-			when x.TransferredNodeWeight IS NULL
-			then 1 - DampingFactor
-			else 1 - DampingFactor + x.TransferredNodeWeight
-		end AS NodeWeight,
-		n.NodeCount,
-		case 
-			when x.TransferredNodeWeight is NULL
-			then 1
-			when abs(n.NodeWeight - (1.0 - DampingFactor + x.TransferredNodeWeight)) < MarginOfError 
-			then 1 
-			else 0 
-		END AS HasConverged
-	FROM Nodes n
-	LEFT OUTER JOIN Nodes_x as x
-	on x.TargetNodeId = n.NodeId;
+  AS SELECT
+    n.NodeId AS NodeId,
+    case
+      when x.TransferredNodeWeight IS NULL
+      then 1 - DampingFactor
+      else 1 - DampingFactor + x.TransferredNodeWeight
+    end AS NodeWeight,
+    n.NodeCount AS NodeCount,
+    case
+      when x.TransferredNodeWeight is NULL
+      then 1
+      when abs(n.NodeWeight - (1.0 - DampingFactor + x.TransferredNodeWeight)) < MarginOfError
+      then 1
+      else 0
+    END AS HasConverged
+  FROM Nodes n
+  LEFT OUTER JOIN (
+    SELECT
+      e.TargetNodeId
+      ,sum(n2.NodeWeight / n2.NodeCount) * 0.85 AS TransferredNodeWeight
+    FROM Nodes n2
+    INNER JOIN Edges e
+      ON n2.NodeId = e.SourceNodeId
+    WHERE e.SourceNodeId <> e.TargetNodeId --self references are ignored
+    GROUP BY e.TargetNodeId
+  ) as x
+  on x.TargetNodeId = n.NodeId;
 
-	delete  from Nodes;
+	DELETE FROM Nodes;
 	INSERT INTO Nodes
 		SELECT * FROM Nodes_prime;
 	DROP TABLE Nodes_prime;
-
-	select
-		IterationCount as IterationCount
-		,*
-	from Nodes;
-
-	set IterationCount = IterationCount + 1;
-END WHILE;
 END;
