@@ -17,10 +17,6 @@ CREATE TABLE Edges
 )
 ENGINE = Log;
 
-delete from Nodes;
-
-delete from Edges;
-
 
 INSERT INTO Nodes
 (NodeId
@@ -36,9 +32,9 @@ INSERT INTO Edges
 (SourceNodeId
 ,TargetNodeId)
 VALUES
-(2,1) --page 2 links to pages 1 and 3
+(2,1)
 ,(2,3)
-,(3,1) --page 3 links to page 1
-,(4,1) -- page 4 links to the 3 other pages
+,(3,1)
+,(4,1)
 ,(4,2)
 ,(4,3);
