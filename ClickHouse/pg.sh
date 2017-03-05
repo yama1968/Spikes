@@ -23,5 +23,5 @@ done
 $ch --query="select avg(NodeWeight) from Node1"
 
 # twitter time = 45 sec -> 42 sec / 0.77 -> 11 sec with clickhouse
-# orkut time = 9 min -> 480 sec
+# orkut time = 9 min -> 480 sec -> 7min20... bof!!!!
 # soc / opt -> 9 min 37 en 46 itérations
