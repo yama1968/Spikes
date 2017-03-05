@@ -1,0 +1,32 @@
+Testing for twitter.txt (offset twitter.txt)
+netload_ch.sh: ligne 7: 
+
+DROP TABLE IF EXISTS Nodes;
+DROP TABLE IF EXISTS Edges;
+
+CREATE TABLE Nodes
+(NodeId Int32
+,NodeWeight Float32
+,NodeCount Int32 default(0)
+,HasConverged Int32 default(0)
+)
+ENGINE = Log;
+
+CREATE TABLE Edges
+(SourceNodeId Int32
+,TargetNodeId Int32
+)
+ENGINE = Log;
+: Nom de fichier trop long
+Code: 62. DB::Exception: Syntax error: failed at position 2 (line 2, col 1): delete from Nodes, expected OPTIMIZE
+
+tail: +twitter.txt: nombre de lignes incorrect
+Code: 108. DB::Exception: No data to insert
+
+1 iterations
+1	0
+0.002
+2 iterations
+1	1
+0.002
+0.15000000596046448

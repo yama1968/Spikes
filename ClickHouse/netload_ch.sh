@@ -4,8 +4,25 @@ dataset=$1
 offset=$2
 
 
-clickhouse-client --query="
-delete from Edges"
+clickhouse-client -n -m < "
+
+DROP TABLE IF EXISTS Nodes;
+DROP TABLE IF EXISTS Edges;
+
+CREATE TABLE Nodes
+(NodeId Int32
+,NodeWeight Float32
+,NodeCount Int32 default(0)
+,HasConverged Int32 default(0)
+)
+ENGINE = Log;
+
+CREATE TABLE Edges
+(SourceNodeId Int32
+,TargetNodeId Int32
+)
+ENGINE = Log;
+"
 
 clickhouse-client --query="
 delete from Nodes"
