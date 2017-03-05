@@ -2,26 +2,7 @@
 
 mclient -s "drop table Node1"
 
-mclient -s "
-create table Node1
-AS
-select
-  n.nodeid,
-  n.nodeweight,
-  CASE
-                WHEN x.TargetNodeCount IS NULL THEN -1
-                ELSE x.TargetNodeCount
-                END AS nodecount,
-	0 AS HasConverged
-from Nodes n
-left outer join
-(
-	select SourceNodeID,
-	       count(*) AS TargetNodeCount
-	from Edges
-	group by SourceNodeId
-) as x
-on x.SourceNodeID = n.NodeId"
+mclient -f csv < pg_setup.sql
 
 iteration=0
 
@@ -30,9 +11,14 @@ SELECT count(*)
   FROM Node1
  WHERE hasconverged = 0") ]
 do
-  mclient -f csv < pg_step.sql
+  mclient -i -f csv < pg_step_opt.sql
   iteration=$(($iteration+1))
+  echo $iteration iterations
+  mclient -i -s "SELECT count(*), HasConverged From Node1 GROUP BY HasConverged ORDER BY HasConverged"
 done
 
-echo $iteration iterations
-mclient -s "select * from node1"
+mclient -s "select avg(NodeWeight) from node1"
+
+# twitter time = 45 sec -> 42 sec / 0.77
+# orkut time = 9 min -> 480 sec
+# soc / opt -> 9 min 37 en 46 itérations
