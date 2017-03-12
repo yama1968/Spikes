@@ -2,18 +2,29 @@
 
 library(sparklyr)
 library(dplyr)
-sc <- spark_connect(maste = "local",
+sc <- spark_connect(master = "local",
                     config = spark_config("spark.yml"))
 
-system.time(df1 <- spark_read_csv(sc, name = "train10k", path = "/home/yannick/tmp/train10k.csv", repartition = 4, memory = TRUE, overwrite = TRUE))
+###
 
-system.time(foo <- df1 %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
-foo
+# system.time(df1 <- spark_read_csv(sc, name = "train10k", path = "/home/yannick/tmp/train10k.csv", repartition = 4, memory = TRUE, overwrite = TRUE))
+#
+# system.time(foo <- df1 %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
+# foo
+#
+# system.time(df <- spark_read_csv(sc, name = "train", path = "/home/yannick/tmp/train.csv",
+#                                  repartition = 16, memory = T, overwrite = TRUE))
+# # 250 sec => 146 sec with 8 repartition
+#
+# spark_write_parquet(df, "/home/yannick/tmp/train.parquet")
 
-system.time(df <- spark_read_csv(sc, name = "train", path = "/home/yannick/tmp/train.csv", repartition = 8, memory = T, overwrite = TRUE))
-# 250 sec => 146 sec with 8 repartition
+###
 
-spark_write_parquet(df, "hdfs://user/yannick/train.parquet")
+system.time( df <- spark_read_parquet(sc,
+                                      name = "train",
+                                      path = "/home/yannick/tmp/train.parquet",
+                                      repartition = 0,
+                                      memory = FALSE) ) # Fastest setting!!!
 
 system.time(foo <- df %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
 # 1.2 sec!!!
@@ -65,6 +76,7 @@ system.time(nnb <- device_id %>%
 nnb
 # 4 secs!
 
+# lag 03
 
 train3 <- df %>%
   mutate(int_day = substr(hour, 5, 2),
@@ -79,9 +91,10 @@ device_plus_dt <- train3 %>%
   mutate(dt_hour = int_hour - lag(int_hour)) %>%
   ungroup()
 
-system.time(device_plus_dt %>%
-  filter(is.null(dt_hour)) %>%
-  count())
+system.time(bar <- device_plus_dt %>%
+              filter(is.null(dt_hour)) %>%
+              count() %>%
+              collect)
 # crash on 1.6..
 # 44 sec on 2.1
 
@@ -96,6 +109,7 @@ dt_per_day <- device_plus_dt %>%
   collect
 )
 dt_per_day
+# 45 sec
 
 
 # join01
@@ -116,6 +130,7 @@ system.time( bar <- foo %>%
                collect )
 #
 bar
+# 20 sec
 
 
 

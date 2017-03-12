@@ -4,7 +4,7 @@ dataset=$1
 offset=$2
 
 
-clickhouse-client -n -m < "
+clickhouse-client -n -m <<END
 
 DROP TABLE IF EXISTS Nodes;
 DROP TABLE IF EXISTS Edges;
@@ -22,13 +22,15 @@ CREATE TABLE Edges
 ,TargetNodeId Int32
 )
 ENGINE = Log;
-"
+
+END
 
 clickhouse-client --query="
 delete from Nodes"
 
 tail -n +$offset /home/yannick/Work/gitlab/vast08/data/$dataset |  \
 tr ' ' ',' | \
+tr '\t' ',' | \
 	clickhouse-client --query="INSERT INTO Edges FORMAT CSV"
 
 clickhouse-client --query="

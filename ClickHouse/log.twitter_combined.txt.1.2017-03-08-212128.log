@@ -1,0 +1,355 @@
+Testing for twitter_combined.txt (offset 1)
+Code: 62. DB::Exception: Syntax error: failed at position 2 (line 2, col 1): delete from Nodes, expected OPTIMIZE
+
+1 iterations
+81265	0
+41	1
+0.003
+2 iterations
+79413	0
+1893	1
+0.003
+3 iterations
+71179	0
+9926	1
+201	2
+0.002
+4 iterations
+65594	0
+15451	1
+261	2
+0.002
+5 iterations
+61155	0
+19859	1
+292	2
+0.002
+6 iterations
+56487	0
+24503	1
+316	2
+0.002
+7 iterations
+52000	0
+28967	1
+339	2
+0.002
+8 iterations
+46891	0
+34062	1
+353	2
+0.003
+9 iterations
+41752	0
+39182	1
+372	2
+0.002
+10 iterations
+36683	0
+44200	1
+423	2
+0.002
+11 iterations
+31861	0
+48998	1
+447	2
+0.002
+12 iterations
+26953	0
+53892	1
+461	2
+0.003
+13 iterations
+22129	0
+58695	1
+482	2
+0.002
+14 iterations
+17358	0
+63451	1
+497	2
+0.002
+15 iterations
+13142	0
+67638	1
+526	2
+0.002
+16 iterations
+9245	0
+71523	1
+538	2
+0.002
+17 iterations
+5948	0
+74808	1
+550	2
+0.002
+18 iterations
+3582	0
+77156	1
+568	2
+0.002
+19 iterations
+2146	0
+78571	1
+589	2
+0.003
+20 iterations
+1341	0
+79363	1
+602	2
+0.002
+21 iterations
+868	0
+79825	1
+613	2
+0.003
+22 iterations
+555	0
+80133	1
+618	2
+0.002
+23 iterations
+382	0
+80303	1
+621	2
+0.002
+24 iterations
+280	0
+80402	1
+624	2
+0.002
+25 iterations
+229	0
+80444	1
+633	2
+0.002
+26 iterations
+211	0
+80460	1
+635	2
+0.002
+27 iterations
+194	0
+80474	1
+638	2
+0.003
+28 iterations
+186	0
+80479	1
+641	2
+0.002
+29 iterations
+176	0
+80487	1
+643	2
+0.002
+30 iterations
+171	0
+80490	1
+645	2
+0.003
+31 iterations
+158	0
+80502	1
+646	2
+0.002
+32 iterations
+144	0
+80514	1
+648	2
+0.002
+33 iterations
+133	0
+80522	1
+651	2
+0.002
+34 iterations
+130	0
+80523	1
+653	2
+0.002
+35 iterations
+129	0
+80523	1
+654	2
+0.002
+36 iterations
+122	0
+80530	1
+654	2
+0.002
+37 iterations
+117	0
+80534	1
+655	2
+0.002
+38 iterations
+108	0
+80541	1
+657	2
+0.002
+39 iterations
+90	0
+80558	1
+658	2
+0.003
+40 iterations
+79	0
+80566	1
+661	2
+0.002
+41 iterations
+62	0
+80575	1
+669	2
+0.002
+42 iterations
+58	0
+80579	1
+669	2
+0.003
+43 iterations
+39	0
+80598	1
+669	2
+0.002
+44 iterations
+29	0
+80607	1
+670	2
+0.002
+45 iterations
+20	0
+80610	1
+676	2
+0.002
+46 iterations
+18	0
+80611	1
+677	2
+0.003
+47 iterations
+17	0
+80611	1
+678	2
+0.003
+48 iterations
+17	0
+80611	1
+678	2
+0.002
+49 iterations
+16	0
+80612	1
+678	2
+0.002
+50 iterations
+15	0
+80612	1
+679	2
+0.002
+51 iterations
+12	0
+80615	1
+679	2
+0.002
+52 iterations
+11	0
+80616	1
+679	2
+0.002
+53 iterations
+9	0
+80617	1
+680	2
+0.002
+54 iterations
+8	0
+80617	1
+681	2
+0.002
+55 iterations
+6	0
+80619	1
+681	2
+0.002
+56 iterations
+5	0
+80620	1
+681	2
+0.002
+57 iterations
+4	0
+80620	1
+682	2
+0.002
+58 iterations
+4	0
+80620	1
+682	2
+0.001
+59 iterations
+3	0
+80621	1
+682	2
+0.002
+60 iterations
+2	0
+80621	1
+683	2
+0.003
+61 iterations
+2	0
+80621	1
+683	2
+0.002
+62 iterations
+2	0
+80621	1
+683	2
+0.002
+63 iterations
+2	0
+80621	1
+683	2
+0.002
+64 iterations
+2	0
+80621	1
+683	2
+0.002
+65 iterations
+2	0
+80621	1
+683	2
+0.002
+66 iterations
+2	0
+80621	1
+683	2
+0.002
+67 iterations
+2	0
+80621	1
+683	2
+0.002
+68 iterations
+2	0
+80621	1
+683	2
+0.001
+69 iterations
+1	0
+80622	1
+683	2
+0.002
+70 iterations
+80622	1
+684	2
+0.002
+0.7815310604141078
+
+real	0m11.326s
+user	0m1.868s
+sys	0m1.436s
