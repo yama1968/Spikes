@@ -132,7 +132,10 @@ system.time( bar <- foo %>%
 bar
 # 20 sec
 
+### drill
 
+library(sergeant)
+ds <- src_drill("local")
 
 
 
