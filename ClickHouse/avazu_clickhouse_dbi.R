@@ -18,7 +18,7 @@ system.time(count.device_ip <-
                                  from train
                                 group by device_ip
                                 order by cnt desc"))
-# 8 secs!
+# 8 secs! 18 sec à froid
 
 count.device_ip %>%
   head(20)

@@ -20,20 +20,20 @@ train %>%
 
 device_id_type <- train %>%
   group_by(device_id, device_type) %>%
-  summarise(nb = count())
+  summarise(nb = n())
 
 device_id <- device_id_type %>%
   group_by(device_id) %>%
-  summarise(nnb = count(), snb = sum(nb))
+  summarise(nnb = n(), snb = sum(nb))
 
 system.time(nnb <- device_id %>%
               filter(nnb >= 2) %>%
               group_by(nnb) %>%
-              summarise(cnt = count()) %>%
+              summarise(cnt = n()) %>%
               arrange(desc(nnb)) %>%
               collect)
 nnb
 
-# mostly broken!!!!!!
+# 4.8 sec
 
 
