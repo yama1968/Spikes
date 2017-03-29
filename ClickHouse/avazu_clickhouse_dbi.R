@@ -10,12 +10,12 @@ foo <- dbGetQuery(con, "select * from Train limit 1000")
 names(foo)
 
 system.time(distinct.device_ip <-
-              dbGetQuery(con, "select count(distinct(device_ip)) from train"))
+              dbGetQuery(con, "select count(distinct(device_ip)) from Train"))
 distinct.device_ip
 
 system.time(count.device_ip <-
               dbGetQuery(con, "select device_ip, count(*) as cnt
-                                 from train
+                                 from Train
                                 group by device_ip
                                 order by cnt desc"))
 # 8 secs! 18 sec à froid
@@ -29,7 +29,7 @@ SELECT substring(hour, 1, 6) AS day,
        count(*) AS clicks_per_day
   FROM (
        SELECT *
-         FROM train
+         FROM Train
         WHERE device_ip = '8a014cbb'
   )
  GROUP BY day
@@ -42,7 +42,7 @@ SELECT hour,
        count(*) AS clicks_per_hour
   FROM (
        SELECT *
-         FROM train
+         FROM Train
         WHERE device_ip = '", h, "'
   )
  GROUP BY hour
@@ -61,7 +61,7 @@ qplot(cph_time, clicks_per_hour, data = cph, geom = "line")
 gph <- dbGetQuery(con, "
 SELECT hour,
        count(*) as clicks_per_hour
-  FROM train
+  FROM Train
  GROUP BY hour
  ORDER BY hour
               ")
