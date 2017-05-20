@@ -24,9 +24,7 @@ val g = time { GraphLoader.edgeListFile(sc, dir + "twitter_combined.txt") }
 
 var np = 8
 val graph = time { Graph(g.vertices.repartition(np),
-                         g.edges.repartition(np))}
-
-time { graph.cache() }
+                         g.edges.repartition(np)).cache}
 
 
 val l = graph.inDegrees.reduce((a,b) => if (a._2 > b._2) a else b)
