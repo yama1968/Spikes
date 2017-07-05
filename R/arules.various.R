@@ -3,6 +3,7 @@
 # install.packages("discretization")
 
 library(arules)
+library(discretization)
 
 data(iris)
 
