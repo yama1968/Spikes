@@ -52,5 +52,8 @@ location.history*/*
 *.nb.html
 .stan/
 target/*
+*.class
+*.cache
+.idea/
 
 *.log
