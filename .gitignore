@@ -57,3 +57,5 @@ target/*
 .idea/
 
 *.log
+*.tgz
+maildir
