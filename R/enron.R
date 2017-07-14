@@ -49,7 +49,7 @@ for (i in 1:nrow(users)) {
   users$mailname[i] <- name
 }
 users$user <- str_sub(users$user, 9)
-inboxes <- merge(inboxes, by.x = "to", users, by.y="user")
+inboxes <- merge(inboxes, by.x = "to", users, by.y = "user")
 inboxes <- data.frame(from = inboxes$from, to = inboxes$mailname)
 
 inboxes$from <- as.character(inboxes$from)
