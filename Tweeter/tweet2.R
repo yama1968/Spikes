@@ -10,7 +10,8 @@ access_secret <- Sys.getenv("tw_ACCESS_SECRET")
 
 setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 
-start <- getUser("yannick_martel")
+# start <- getUser("yannick_martel")
+start <- getUser("ppezziardi")
 friends.object <- lookupUsers(start$getFollowerIDs())
 
 length(friends.object)
@@ -18,19 +19,20 @@ length(friends.object)
 class(friends.object[[1]])
 
 foo <- friends.object[c(1)]
-foo <- friends.object
 
 followers.cache <- list()
 
 getFollowers.with.cache <- function(x) {
-  id <- x$getScreenName()
+  x.id <- x$getScreenName()
 
-  if (is.null(followers.cache[[id]])) {
+  if (is.null(followers.cache[[x.id]])) {
+    # mettre la limitation de cadence ici en fait!!!!
     y <- x$getFollowers()
-    followers.cache[[id]] <- y
+    followers.cache[[x.id]] <<- y
+    print("added to "); print(x.id)
     y
   } else
-    followers.cache[[id]]
+    followers.cache[[x.id]]
 }
 
 
@@ -42,17 +44,25 @@ accu <- list()
 
 Sys.sleep(min15)
 
-for (x in foo) {
-  print(x$getName())
-  f <- getFollowers.with.cache(x)
-  f.names <- lapply(X = f, FUN = function(x) x$getScreenName())
-  f.names.collapsed <- paste(f.names, collapse = "||")
-  print(f.names.collapsed)
-  accu[[(x$getScreenName())]] <- f.names
+for (x in friends.object) {
+  print(x$getName()); print(x$getScreenName())
+  if (!is.null(accu[[x$getScreenName()]])) {
+    print("   passed")
+  } else {
+    f <- getFollowers.with.cache(x)
+    f.names <- lapply(X = f, FUN = function(x) x$getScreenName())
+    f.names.collapsed <- paste(f.names, collapse = "||")
+    print(f.names.collapsed)
+    accu[[(x$getScreenName())]] <- f.names
 
-  so.far <- so.far + 1
-  if (so.far %% 15 == 0) Sys.sleep(min15)
+    so.far <- so.far + 1
+    if (so.far %% max == 0) {
+      saveRDS(accu, file = "/home/yannick/tmp/follower_graph_tmp.rds")
+      print(paste(">> waiting for ", min15, " seconds"))
+      Sys.sleep(min15)
+    }
+  }
 }
 
-saveRDS(accu, file = "/home/yannick/tmp/follower_graph.rds")
+saveRDS(accu, file = "/home/yannick/tmp/follower_graph1.rds")
 
