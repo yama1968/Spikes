@@ -35,12 +35,12 @@ getFollowers.with.cache <- function(x) {
     followers.cache[[x.id]]
 }
 
+accu <- list()
 
 max <- 15
 so.far <- 0
 min15 <- 16 * 60
 
-accu <- list()
 
 Sys.sleep(min15)
 
@@ -67,3 +67,7 @@ for (x in friends.object) {
 saveRDS(accu, file = "/home/yannick/tmp/follower_graph1.rds")
 
 for (i in names(accu)) if (0 == length(accu[[i]])) { print(i); accu[[i]] <- NULL }
+
+flag.bug <- function(x) {
+  accu[[x]] <<- list("bug")
+}
