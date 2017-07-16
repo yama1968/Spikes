@@ -10,8 +10,8 @@ access_secret <- Sys.getenv("tw_ACCESS_SECRET")
 
 setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 
-# start <- getUser("yannick_martel")
-start <- getUser("ppezziardi")
+start <- getUser("yannick_martel")
+
 friends.object <- lookupUsers(start$getFollowerIDs())
 
 length(friends.object)
