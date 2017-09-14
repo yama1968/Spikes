@@ -18,11 +18,13 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "Lahman", "VGAM", "RUnit",
       "devtools", "xgboost",
       "R2jags", "pROC", "xkcd", "plotly",
-      "choroplethr", "choroplethrMaps", "dummies", "rio",
+  #    "choroplethr", "choroplethrMaps", 
+      "dummies", "rio",
       "dendextend", "rafalib",
       "gridExtra", "ergm", "DT", "pryr",
       "shinydashboard", "visNetwork", "drat",
-      "text2vec", "twitteR", "tidygraph")
+      "text2vec", "twitteR", "tidygraph", "lubridate", "xgboost", "party", 
+      "arules", "arulesViz" )
 
 
 p <- p[ ! p %in% installed.packages()]

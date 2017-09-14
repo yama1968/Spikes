@@ -67,6 +67,8 @@ for (x in friends.object) {
 saveRDS(accu, file = "/home/yannick/tmp/follower_graph1.rds")
 
 for (i in names(accu)) if (0 == length(accu[[i]])) { print(i); accu[[i]] <- NULL }
+for (i in names(accu)) if (0 == length(accu[[i]])) { print(i)}
+
 
 flag.bug <- function(x) {
   accu[[x]] <<- list("bug")

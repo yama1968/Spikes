@@ -16,7 +16,7 @@ dtest  <- xgb.DMatrix(data   = test$data,
 watchlist <- list(train = dtrain,
                   test  = dtest)
 
-params <- list(max.depth = 2,
+params <- list(max.depth = 5,
                eta = 1, 
                nthread = 2, 
                nround = 2,

@@ -33,3 +33,9 @@ strict <- filter.strict.egonet(egonet)
 summary(strict)
 
 egonet %>% filter(to == "bug")
+
+solo <- egonet %>% group_by(to) %>% summarize(cnt = n()) %>% filter(cnt == 1) %>% select(to) %>% unlist %>% unique
+egonet2 <- egonet %>% filter(! (to %in% solo))
+
+ig <- igraph::graph.edgelist(egonet2 %>% as.matrix)
+plot(ig)
