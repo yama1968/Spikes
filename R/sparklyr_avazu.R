@@ -5,6 +5,10 @@ library(dplyr)
 sc <- spark_connect(master = "local",
                     config = spark_config("spark.yml"))
 
+sc <- spark_connect(master = "spark://patty:7077",
+                    config = spark_config("spark.yml"),
+                    spark_home = "/home/yannick/Work/3p/spark-2.1.0-bin-hadoop2.7/")
+
 ###
 
 # system.time(df1 <- spark_read_csv(sc, name = "train10k", path = "/home/yannick/tmp/train10k.csv", repartition = 4, memory = TRUE, overwrite = TRUE))
@@ -82,8 +86,8 @@ nnb
 # lag 03
 
 train3 <- df %>%
-  mutate(int_day = substr(hour, 5, 2),
-         int_hour = substr(hour, 7, 2))
+  mutate(int_day = `substring(hour, 5, 2)`,
+         int_hour = `substring(hour, 7, 2)`)
 train3 %>% select(id, int_day, int_hour)
 
 device_plus_dt <- train3 %>%
@@ -135,10 +139,6 @@ system.time( bar <- foo %>%
 bar
 # 20 sec
 
-### drill
-
-library(sergeant)
-ds <- src_drill("local")
 
 
 
