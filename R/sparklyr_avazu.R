@@ -24,9 +24,12 @@ sc <- spark_connect(master = "spark://patty:7077",
 
 ###
 
+train.parquet = "/home/yannick/tmp/train.parquet"
+train.parquet = "c:\\home\\Datasets\\train.parquet"
+
 system.time( df <- spark_read_parquet(sc,
                                       name = "train",
-                                      path = "/home4/yannick4/tmp/train.parquet",
+                                      path = train.parquet,
                                       repartition = 0,
                                       memory = FALSE) ) # Fastest setting!!!
 
