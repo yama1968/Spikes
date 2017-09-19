@@ -188,13 +188,15 @@ defaults = {
 
 trials = Trials()
 the_best = 0
+the_best_params = {}
+nb = 0
 
 start = datetime.now()
 
 
 def hyperopt_train_test(params):
 
-    global the_best
+    global the_best, the_best_params, nb
 
     params["max_depth"] +=1
     params["eta"] = exp(params["eta"])
@@ -208,9 +210,12 @@ def hyperopt_train_test(params):
 
     if the_best > -weight:
         the_best = -weight
+        the_best_params = params
         print(params, " => ", -weight)
         print(r.tail(1))
-        print(str(datetime.now() - start))
+        print(nb, "/", str(datetime.now() - start))
+
+    nb += 1
 
     return -weight
 
@@ -240,6 +245,10 @@ paramgrid = {'max_depth':   np.arange(0, 10),
              'subsample': np.arange(0.2, 1.05, 0.05)
 }
 
+from random import seed
+
+seed(42)
+
 if "deap" in argv:
     best = EvolutionaryAlgorithmSearchCV(estimator=xgb.XGBClassifier(),
                                    params=paramgrid,
@@ -255,6 +264,7 @@ if "deap" in argv:
     best.fit(train_onehot, labels_train)
 else:
     best = fmin(f, space4xgb, algo=partial(tpe.suggest, n_startup_jobs=1), max_evals=1000, trials=trials)
+    print (the_best_params)
 
 
 # In[50]:
