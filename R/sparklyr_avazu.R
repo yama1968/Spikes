@@ -119,24 +119,26 @@ dt_per_day
 # 45 sec
 
 
-# join01
-
-device_id_nb_tmp <- df %>%
-  group_by(device_id) %>%
-  summarise(nnb = count(), p = avg(click))
-
-
-foo <- train_features <- device_id_nb_tmp %>%
-  inner_join(df, on = "device_id") %>%
-  group_by(click) %>%
-  summarise(cnt = count())
-
-foo %>% explain
-
-system.time( bar <- foo %>%
-               collect )
-#
-bar
+# # join01
+# 
+# device_id_nb_tmp <- df %>%
+#   group_by(device_id) %>%
+#   summarise(nnb = count(), p = avg(click))
+# 
+# 
+# foo <- device_id_nb_tmp %>%
+#   inner_join(df, on = "device_id") %>%
+#   group_by(click) %>%
+#   summarise(cnt = count())
+# 
+# foo %>% explain
+# 
+# system.time( bar <- foo %>%
+#                arrange(desc(cnt)) %>%
+#                head(60) %>%
+#                collect )
+# #
+# bar
 # 20 sec
 
 
