@@ -86,8 +86,8 @@ nnb
 # lag 03
 
 train3 <- df %>%
-  mutate(int_day = `substring(hour, 5, 2)`,
-         int_hour = `substring(hour, 7, 2)`)
+  mutate(int_day = substr(hour, 5, 6),
+         int_hour = substr(hour, 7, 8))
 train3 %>% select(id, int_day, int_hour)
 
 device_plus_dt <- train3 %>%
