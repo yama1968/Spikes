@@ -86,8 +86,8 @@ nnb
 # lag 03
 
 train3 <- df %>%
-  mutate(int_day = `substring(hour, 5, 2)`,
-         int_hour = `substring(hour, 7, 2)`)
+  mutate(int_day = substr(hour, 5, 6),
+         int_hour = substr(hour, 7, 8))
 train3 %>% select(id, int_day, int_hour)
 
 device_plus_dt <- train3 %>%
@@ -119,24 +119,26 @@ dt_per_day
 # 45 sec
 
 
-# join01
-
-device_id_nb_tmp <- df %>%
-  group_by(device_id) %>%
-  summarise(nnb = count(), p = avg(click))
-
-
-foo <- train_features <- device_id_nb_tmp %>%
-  inner_join(df, on = "device_id") %>%
-  group_by(click) %>%
-  summarise(cnt = count())
-
-foo %>% explain
-
-system.time( bar <- foo %>%
-               collect )
-#
-bar
+# # join01
+# 
+# device_id_nb_tmp <- df %>%
+#   group_by(device_id) %>%
+#   summarise(nnb = count(), p = avg(click))
+# 
+# 
+# foo <- device_id_nb_tmp %>%
+#   inner_join(df, on = "device_id") %>%
+#   group_by(click) %>%
+#   summarise(cnt = count())
+# 
+# foo %>% explain
+# 
+# system.time( bar <- foo %>%
+#                arrange(desc(cnt)) %>%
+#                head(60) %>%
+#                collect )
+# #
+# bar
 # 20 sec
 
 
