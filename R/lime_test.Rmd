@@ -1,0 +1,59 @@
+---
+title: "Lime test"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(caret)
+library(lime)
+library(vcd)
+
+data(Arthritis)
+
+df_raw <- Arthritis
+df_raw$target <- df_raw$Improved != "None"
+
+trainIndex <- createDataPartition(df_raw$target, p = 0.7, list= FALSE, times = 1)
+
+dummies <- dummyVars(target ~ Treatment + Sex + Age,
+                     data = df_raw)
+
+df_prep <- as.data.frame(predict(dummies, df_raw))
+df_prep$target <- as.factor(df_raw$target)
+
+df <- df_prep[trainIndex,]
+df_lab <- df_prep[- trainIndex,]
+
+# Create Random Forest model on iris data
+model <- train(target ~ ., 
+               data = df, 
+               metric = "logloss",
+               method = 'rf')
+
+# Create an explainer object
+explainer <- lime(df, model)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+# Explain new observation
+explanation <- explain(df[c(1,30,31,45),], explainer, n_labels = 1, n_features = 2)
+
+# The output is provided in a consistent tabular format and includes the
+# output from the model.
+head(explanation)
+```
+
+```{r}
+plot_features(explanation)
+```
+

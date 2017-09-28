@@ -131,11 +131,12 @@ print(proc.time() - tic)
 
 mx.set.seed(0)
 tic <- proc.time()
-model <- mx.model.FeedForward.create(lenet, X=train.array, y=train.y,
-                                     ctx=device.gpu, num.round=12, array.batch.size=100,
-                                     learning.rate=0.02, momentum=0.9, wd=0.00001,
-                                     eval.metric=mx.metric.accuracy,
-                                     epoch.end.callback=mx.callback.log.train.metric(100))
+model <- mx.model.FeedForward.create(lenet, X = train.array, y = train.y,
+                                     ctx = device.gpu, num.round = 20, array.batch.size = 100,
+                                     learning.rate = 0.015, momentum = 0.85, wd = 0.00001,
+                                     eval.metric = mx.metric.accuracy,
+                                     epoch.end.callback = mx.callback.log.train.metric(100),
+                                     eval.data = list(data = valid.array, label = valid.y))
 print(proc.time() - tic)
 
 preds <- predict(model, ctx=mx.gpu(0), valid.array)
