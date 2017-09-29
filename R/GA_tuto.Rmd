@@ -1,0 +1,152 @@
+---
+title: "GA testing"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+GA tutorial from https://cran.r-project.org/web/packages/GA/vignettes/GA.html
+
+```{r}
+library(GA)
+```
+
+### One dimension
+
+```{r}
+f <- function(x) (x^2 + x) * cos(x)
+min <- -10; max <- 10
+curve(f, min, max, n = 1000)
+```
+
+```{r}
+GA <- ga(type = "real-valued", fitness = f, min = min, max = max,
+         monitor = FALSE)
+summary(GA)
+```
+
+```{r}
+plot(GA)
+```
+
+```{r}
+curve(f, min, max, n = 1000)
+points(GA@solution, GA@fitnessValue, col = 2, pch = 19)
+```
+
+### Optimization in two dimensions
+
+```{r}
+Rastrigin <- function(x1, x2) {
+  20 + x1^2 + x2^2 - 10 * (cos(2*pi*x1) + cos(2*pi*x2))
+}
+
+x1 <- x2 <- seq(-5.12, 5.12, by = 0.1)
+f <- outer(x1, x2, Rastrigin)
+persp3D(x1, x2, f, theta = 50, phi = 20, color.palette = bl2gr.colors)
+```
+
+```{r}
+filled.contour(x1, x2, f, color.palette = bl2gr.colors)
+```
+
+```{r}
+GA <- ga(type = "real-valued",
+         fitness = function(x) -Rastrigin(x[1], x[2]),
+         min = c(-5.12, -5.12), max = c(5.12, 5.12),
+         popSize = 50, maxiter = 1000, run = 100)
+summary(GA)
+```
+
+```{r}
+plot(GA)
+```
+
+### Hybrid GAs
+
+```{r}
+optimArgs = list(method = "L-BFGS-B", 
+                 poptim = 0.05,
+                 pressel = 0.5,
+                 control = list(fnscale = -1, maxit = 100))
+
+GA <- ga(type = "real-valued",
+         fitness = function(x) -Rastrigin(x[1], x[2]),
+         min = c(-5.12, -5.12), max = c(5.12, 5.12),
+         popSize = 50, maxiter = 1000, run = 100,
+         optim = TRUE)
+summary(GA)
+```
+
+```{r}
+plot(GA)
+```
+
+### Memoization
+
+```{r}
+data(fat, package = "UsingR")
+
+target <- "body.fat.siri"
+params <- setdiff(names(fat), target)
+fat.form <- formula(paste(target,
+                          paste(params, collapse = " + "),
+                          sep = " ~ "))
+
+mod <- lm(fat.form,
+          data = fat)
+summary(mod)
+```
+
+```{r}
+x <- model.matrix(mod)[,-1]
+y <- model.response(mod$model)
+
+fitness <- function(string) {
+  inc <- which (string == 1)
+  X <- cbind(1, x[,inc])
+  mod <- lm.fit(X, y)
+  class(mod) <- "lm"
+  -BIC(mod)
+}
+
+library(memoise)
+mfitness <- memoise(fitness)
+is.memoised(fitness)
+```
+
+```{r}
+is.memoised(mfitness)
+```
+
+```{r}
+library(rbenchmark)
+
+forget(mfitness)
+
+mytest <- function(fitness) 
+  ga("binary", fitness = fitness, nBits = ncol(x),
+     popSize = 100, maxiter = 100, seed = 1, monitor = FALSE)
+
+tab <- benchmark(GA1 = mytest(fitness),
+                 GA2 = mytest(mfitness),
+                 columns = c("test", "replications", "elapsed", "relative"),
+                 replications = 10)
+tab$average = with(tab, elapsed / replications)
+
+tab
+```
+```{r}
+GA <- mytest(mfitness)
+
+plot(GA)
+```
+
+```{r}
+summary(GA)
+```
+
+```{r}
+params[which(GA@solution == 1)]
+```
+

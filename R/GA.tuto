@@ -1,0 +1,34 @@
+---
+title: "GA testing"
+output: html_notebook
+---
+
+GA tutorial from https://cran.r-project.org/web/packages/GA/vignettes/GA.html
+
+```{r}
+library(GA)
+```
+
+### One dimension
+
+```{r}
+f <- function(x) (x^2 + x) * cos(x)
+min <- -10; max <- 10
+curve(f, min, max, n = 1000)
+```
+
+```{r}
+GA <- ga(type = "real-valued", fitness = f, min = min, max = max,
+         monitor = FALSE)
+summary(GA)
+```
+
+```{r}
+plot(GA)
+```
+
+```{r}
+curve(f, min, max, n = 1000)
+points(GA@solution, GA@fitnessValue, col = 2, pch = 19)
+```
+

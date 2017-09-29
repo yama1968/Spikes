@@ -1,4 +1,13 @@
-#
+---
+title: "Avazu Clickhouse test"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r}
 
 library(DBI)
 library(dplyr)
@@ -8,21 +17,33 @@ con <- dbConnect(clickhouse::clickhouse(), host = "localhost",
 foo <- dbGetQuery(con, "select * from Train limit 1000")
 
 names(foo)
+```
 
+```{r}
 system.time(distinct.device_ip <-
               dbGetQuery(con, "select count(distinct(device_ip)) from Train"))
-distinct.device_ip
 
+```
+
+```{r}
+distinct.device_ip
+```
+
+```{r}
 system.time(count.device_ip <-
               dbGetQuery(con, "select device_ip, count(*) as cnt
                                  from Train
                                 group by device_ip
                                 order by cnt desc"))
-# 8 secs! 18 sec à froid
+```
 
+```{r}
 count.device_ip %>%
   head(20)
+```
 
+
+```{r}
 system.time(count.8a014cbb <-
               dbGetQuery(con,"
 SELECT substring(hour, 1, 6) AS day,
@@ -34,8 +55,13 @@ SELECT substring(hour, 1, 6) AS day,
   )
  GROUP BY day
  ORDER BY day"))
-count.8a014cbb
+```
 
+```{r}
+count.8a014cbb
+```
+
+```{r}
 count_per_hour <- function(h) {
   dbGetQuery(con, paste0("
 SELECT hour,
@@ -50,14 +76,18 @@ SELECT hour,
 }
 
 system.time(cph <- count_per_hour("8a014cbb"))
+```
 
+```{r}
 library(lubridate)
 library(ggplot2)
 library(lubridate)
 
 cph_time <- as.POSIXct(ymd(substr(cph$hour, 1, 6)) + hours(substr(cph$hour, 7, 8)))
 qplot(cph_time, clicks_per_hour, data = cph, geom = "line")
+```
 
+```{r}
 gph <- dbGetQuery(con, "
 SELECT hour,
        count(*) as clicks_per_hour
@@ -68,3 +98,4 @@ SELECT hour,
 
 gph_time <- as.POSIXct(ymd(substr(gph$hour, 1, 6)) + hours(substr(gph$hour, 7, 8)))
 qplot(gph_time, clicks_per_hour, data = gph, geom = "line")
+```
