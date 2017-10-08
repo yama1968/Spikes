@@ -1,0 +1,92 @@
+---
+title: "Keras R CNN""
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+Sys.setenv(PATH=paste("/home/yannick/bin/anaconda3/bin", Sys.getenv("PATH"), sep = ":"))
+library(keras)
+
+use_python(python = "/home/yannick/bin/anaconda3/lib/python3.5")
+use_condaenv("tf", conda = "/home/yannick/bin/anaconda3/envs/tf/bin/conda")
+Sys.setenv(TENSORFLOW_PYTHON="/home/yannick/bin/anaconda3/bin/envs/tf/bin/python")
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+mnist <- dataset_mnist()
+
+
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+
+# reshape
+dim(x_train) <- c(nrow(x_train), 28, 28, 1)
+dim(x_test) <- c(nrow(x_test), 28, 28, 1)
+# rescale
+x_train <- x_train / 255
+x_test <- x_test / 255
+
+y_train <- to_categorical(y_train, 10)
+y_test <- to_categorical(y_test, 10)
+
+input_shape <- c(28, 28, 1)
+
+print(dim(x_train))
+```
+
+```{r}
+model <- keras_model_sequential() 
+model %>% 
+  layer_conv_2d(filters = 32, kernel_size = c(3,3),
+                input_shape = input_shape, activation = "relu") %>%
+  layer_conv_2d(filters = 64, kernel_size = c(3, 3),
+                activation = "relu") %>%
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>%
+  layer_dropout(0.25) %>%
+  layer_flatten() %>%
+  layer_dense(128, activation = "relu") %>%
+  layer_dropout(0.5) %>%
+  layer_dense(10, activation = "softmax")
+
+summary(model)
+```
+
+```{r}
+model %>%
+  compile(loss="categorical_crossentropy",
+          optimizer = optimizer_rmsprop(),
+          metrics = c("accuracy"))
+
+history <- model %>%
+  fit(x_train, y_train,
+      epochs = 12, batch_size = 128,
+      validation_data = list(x_test, y_test))
+```
+
+```{r}
+plot(history)
+```
+
+```{r}
+scores <- model %>% evaluate(
+  x_test, y_test, verbose = 0
+)
+
+# Output metrics
+cat('Test loss:', scores[[1]], '\n')
+cat('Test accuracy:', scores[[2]], '\n')
+```
+

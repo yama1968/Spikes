@@ -38,3 +38,11 @@ importanceRaw <- xgb.importance(train$data@Dimnames[[2]], model = bst, data = tr
 importanceClean <- importanceRaw[,`:=`(Cover=NULL, Frequency=NULL)]
 as.data.frame(importanceClean)
 
+
+library(xgboostExplainer)
+
+explainer = buildExplainer(bst, dtrain, type = "binary")
+pred.breakdown <- explainPredictions(bst, explainer, dtest)
+
+showWaterfall(bst, explainer, dtest, test$data, 2, type = "binary")
+showWaterfall(bst, explainer, dtest, test$data, 98, type = "binary")

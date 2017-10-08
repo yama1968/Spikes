@@ -1,0 +1,29 @@
+---
+title: "Lightgbm R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(lightgbm)
+data(agaricus.train, package = 'lightgbm')
+train <- agaricus.train
+dtrain <- lgb.Dataset(train$data, label = train$label)
+params <- list(objective="binary", metric="auc")
+model <- lgb.cv(params, dtrain, 10, nfold=5, min_data=1, learning_rate=1, early_stopping_rounds=10)
+```
+
+
+```{r}
+model
+```
+```{r}
+print(dim(train$data))
+print(summary(train))
+print(colnames(train$data))
+head(train)
+```
+
