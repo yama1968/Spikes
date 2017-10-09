@@ -120,6 +120,9 @@ class VariationalAutoencoder(object):
     def fit(self, *args, **kwargs):
         return self.vae.fit(*args, **kwargs)
 
+    def predict(self, *args, **kwargs):
+        return self.vae.predict(*args, **kwargs)
+
     def summary(self):
         return self.vae.summary()
 
