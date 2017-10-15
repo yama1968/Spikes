@@ -1,7 +1,9 @@
 '''
 Library for variational autoencoder with Keras.
 
-Reference: "Auto-Encoding Variational Bayes" https://arxiv.org/abs/1312.6114
+Reference: 
+> "Auto-Encoding Variational Bayes" https://arxiv.org/abs/1312.6114
+> https://github.com/fchollet/keras/blob/master/examples/variational_autoencoder.py
 '''
 
 import numpy as np
@@ -9,11 +11,12 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from functools import partial
 
-from keras.layers import Input, Dense, Lambda, Layer
+from keras.layers import Input, Dense, Lambda, Layer, Concatenate
 from keras.models import Model
 from keras import backend as K
 from keras import metrics
 from keras.datasets import mnist
+
 
 
 # Custom loss layer
@@ -85,6 +88,8 @@ def buildVAE(input_dim,
     vae.compile(optimizer='rmsprop', loss=None)
     encoder = Model(x, z_mean)
 
+    sigmaEncoder = Model(x, z_log_var)
+
     decoder_input = Input(shape=(latent_dim,))
     _h_decoded = decoder_input
     for decoder_h in decoders_h:
@@ -93,7 +98,7 @@ def buildVAE(input_dim,
 
     decoder = Model(decoder_input, _x_decoded_mean)
 
-    return vae, encoder, decoder
+    return vae, encoder, decoder, sigmaEncoder
 
 
 class VariationalAutoencoder(object):
@@ -111,7 +116,10 @@ class VariationalAutoencoder(object):
         self.latent_dim = latent_dim
         self.epsilon_std = epsilon_std
 
-        self.vae, self.encoder, self.decoder = \
+        self.vae, \
+        self.encoder, \
+        self.decoder, \
+        self.zlogvarEncoder = \
             buildVAE(self.input_dim,
                      self.hidden_dims,
                      self.latent_dim,
@@ -129,5 +137,14 @@ class VariationalAutoencoder(object):
     def encode(self, x, batch_size=128):
         return self.encoder.predict(x, batch_size)
 
+    def zlogvarEncode(self, x, batch_size=128):
+        return self.zlogvarEncoder.predict(x, batch_size)
+    
+    def sigmaEncode(self, x, batch_size=128):
+        return np.exp(self.zlogvarEncode(x, batch_size)/2)
+  
     def generate(self, z, batch_size=128):
         return self.decoder.predict(z, batch_size)
+    
+    def samplingEncoder(self, x, batch_size=128):
+        None

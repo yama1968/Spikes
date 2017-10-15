@@ -1,3 +1,7 @@
+
+Sys.setenv(PATH=paste("/home/yannick/bin/anaconda3/bin", Sys.getenv("PATH"), sep = ":"))
+keras::use_condaenv("r-tensorflow")
+
 library(keras)
 
 mnist <- dataset_mnist()

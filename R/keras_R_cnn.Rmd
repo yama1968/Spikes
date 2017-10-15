@@ -1,5 +1,5 @@
 ---
-title: "Keras R CNN""
+title: "Keras R CNN"
 output: html_notebook
 ---
 
@@ -9,12 +9,9 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 ```{r}
 Sys.setenv(PATH=paste("/home/yannick/bin/anaconda3/bin", Sys.getenv("PATH"), sep = ":"))
+keras::use_condaenv("r-tensorflow")
+
 library(keras)
-
-use_python(python = "/home/yannick/bin/anaconda3/lib/python3.5")
-use_condaenv("tf", conda = "/home/yannick/bin/anaconda3/envs/tf/bin/conda")
-Sys.setenv(TENSORFLOW_PYTHON="/home/yannick/bin/anaconda3/bin/envs/tf/bin/python")
-
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
