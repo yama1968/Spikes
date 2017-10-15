@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from functools import partial
+import json
 
 from keras.layers import Input, Dense, Lambda, Layer, Concatenate
 from keras.models import Model
@@ -103,9 +104,29 @@ def buildVAE(input_dim,
 
 class VariationalAutoencoder(object):
 
-    def _buildVAE(self):
-        None
-
+    __version = 0.1
+ 
+    @classmethod
+    def from_file(cls, arch, weights=None):
+        
+        with open(arch) as infile:
+            smaller_dict = json.load(infile)
+        
+        if smaller_dict["_version"] > cls.__version:
+            raise Exception("Version %f from file more recent than version %f from lib!" % \
+                            (smaller_dict["_version"], cls.__version))
+        
+        vae = cls(smaller_dict["input_dim"],
+                  smaller_dict["hidden_dims"],
+                  smaller_dict["latent_dim"],
+                  smaller_dict["epsilon_std"])
+        
+        if not weights is None:
+            vae.vae.load_weights(weights)
+            
+        return vae
+    
+    
     def __init__(self,
                  input_dim,
                  hidden_dims=[64],
@@ -115,6 +136,7 @@ class VariationalAutoencoder(object):
         self.hidden_dims = hidden_dims
         self.latent_dim = latent_dim
         self.epsilon_std = epsilon_std
+        self._version = 0.1
 
         self.vae, \
         self.encoder, \
@@ -125,6 +147,18 @@ class VariationalAutoencoder(object):
                      self.latent_dim,
                      self.epsilon_std)
 
+            
+    def save(self, arch, weights=None):
+        
+        smaller_dict = {k: v for k, v in self.__dict__.items()
+                             if type(v) in [int, float, list, str]}
+        with open(arch, "w") as outfile:
+            json.dump(smaller_dict, outfile)
+        
+        if not weights is None:
+            self.vae.save_weights(weights)
+        
+            
     def fit(self, *args, **kwargs):
         return self.vae.fit(*args, **kwargs)
 
