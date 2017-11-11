@@ -1,0 +1,100 @@
+---
+title: "MNIST mxnet"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+require(mlbench)
+
+## Loading required package: mlbench
+
+require(mxnet)
+library(caret)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+mnist <- "/home4/2015/home2/yannick2/DataScience2/kaggle_mnist/"
+
+train <- read.csv(paste0(mnist, 'train.csv'), header = TRUE)
+test <- read.csv(paste0(mnist,'test.csv'), header = TRUE)
+
+train.x <- train[,-1]
+train.y <- train[,1]
+
+train.x <- (train.x/255)
+test <- (test/255)
+
+train.filter <- createDataPartition(train.y, p = 0.7, list = FALSE)
+valid.x <- train.x[-train.filter,]
+valid.y <- train.y[-train.filter]
+train.x <- train.x[train.filter,]
+train.y <- train.y[train.filter]
+
+c(dim(train.x), dim(train.y), dim(valid.x), dim(valid.y))
+```
+
+```{r}
+# input
+data <- mx.symbol.Variable('data')
+# first conv
+conv1 <- mx.symbol.Convolution(data=data, kernel=c(5,5), num_filter=20)
+tanh1 <- mx.symbol.Activation(data=conv1, act_type="tanh")
+pool1 <- mx.symbol.Pooling(data=tanh1, pool_type="max",
+                           kernel=c(2,2), stride=c(2,2))
+# second conv
+conv2 <- mx.symbol.Convolution(data=pool1, kernel=c(5,5), num_filter=50)
+tanh2 <- mx.symbol.Activation(data=conv2, act_type="tanh")
+pool2 <- mx.symbol.Pooling(data=tanh2, pool_type="max",
+                           kernel=c(2,2), stride=c(2,2))
+# first fullc
+flatten <- mx.symbol.Flatten(data=pool2)
+fc1 <- mx.symbol.FullyConnected(data=flatten, num_hidden=500)
+tanh3 <- mx.symbol.Activation(data=fc1, act_type="tanh")
+# second fullc
+fc2 <- mx.symbol.FullyConnected(data=tanh3, num_hidden=10)
+# loss
+lenet <- mx.symbol.SoftmaxOutput(data=fc2)
+
+lenet
+```
+
+```{r}
+train.array <- t(train.x)
+dim(train.array) <- c(28, 28, 1, nrow(train.x))
+test.array <- t(test)
+dim(test.array) <- c(28, 28, 1, nrow(test))
+
+valid.array <- t(valid.x)
+dim(valid.array) <- c(28, 28, 1, nrow(valid.x))
+
+n.gpu <- 1
+device.cpu <- mx.cpu()
+device.gpu <- lapply(0:(n.gpu-1), function(i) {
+  mx.gpu(i)
+})
+
+device.gpu
+```
+
+```{r}
+mx.set.seed(0)
+tic <- proc.time()
+model <- mx.model.FeedForward.create(lenet, X = train.array, y = train.y,
+                                     ctx = device.gpu, num.round = 100, array.batch.size = 100,
+                                     #learning.rate = 0.009, momentum = 0.95, wd = 0.0001,
+                                     learning.rate = 0.009, momentum = 0.97, wd = 0.0001,
+                                     eval.metric = mx.metric.accuracy,
+                                     epoch.end.callback = mx.callback.log.train.metric(100),
+                                     eval.data = list(data = valid.array, label = valid.y))
+print(proc.time() - tic)
+```
+

@@ -20,9 +20,11 @@ test.x = data.matrix(Sonar[-train.ind, 1:60])
 test.y = Sonar[-train.ind, 61]
 
 mx.set.seed(0)
-model <- mx.mlp(train.x, train.y, hidden_node=5, out_node=2, out_activation="softmax",
-                num.round=40, array.batch.size=15, learning.rate=0.06, momentum=0.8,
-                eval.metric=mx.metric.accuracy)
+model <- mx.mlp(train.x, train.y, hidden_node=10, out_node=2, out_activation="softmax",
+                num.round=40, array.batch.size=15, learning.rate=0.06,
+                optimizer="adagrad",
+                eval.metric=mx.metric.accuracy,
+                ctx = mx.gpu())
 
 preds = predict(model, test.x)
 
@@ -132,8 +134,9 @@ print(proc.time() - tic)
 mx.set.seed(0)
 tic <- proc.time()
 model <- mx.model.FeedForward.create(lenet, X = train.array, y = train.y,
-                                     ctx = device.gpu, num.round = 50, array.batch.size = 100,
-                                     learning.rate = 0.01, momentum = 0.85, wd = 0.00001,
+                                     ctx = device.gpu, num.round = 100, array.batch.size = 100,
+                                     #learning.rate = 0.009, momentum = 0.95, wd = 0.0001,
+                                     learning.rate = 0.009, momentum = 0.97, wd = 0.0001,
                                      eval.metric = mx.metric.accuracy,
                                      epoch.end.callback = mx.callback.log.train.metric(100),
                                      eval.data = list(data = valid.array, label = valid.y))
@@ -142,7 +145,7 @@ print(proc.time() - tic)
 preds <- predict(model, ctx=mx.gpu(0), valid.array)
 pred.label <- max.col(t(preds)) - 1
 print(mean(valid.y == pred.label))
-# 
+#
 # 47] Validation-accuracy=0.99968253968254
 # [48] Train-accuracy=0.999642857142857
 # [48] Validation-accuracy=0.999761904761905
@@ -151,8 +154,8 @@ print(mean(valid.y == pred.label))
 # [50] Train-accuracy=0.999714285714286
 # [50] Validation-accuracy=0.999761904761905
 # > print(proc.time() - tic)
-# utilisateur     système      écoulé 
-# 195.044      17.104     100.601 
+# utilisateur     système      écoulé
+# 195.044      17.104     100.601
 # > preds <- predict(model, ctx=mx.gpu(0), valid.array)
 # > pred.label <- max.col(t(preds)) - 1
 # > print(mean(valid.y == pred.label))
@@ -163,7 +166,7 @@ mx.set.seed(0)
 tic <- proc.time()
 model <- mx.model.FeedForward.create(lenet, X=train.array, y=train.y,
                                      ctx=device.gpu, num.round=12, array.batch.size=256,
-                                     optimizer = "adagrad",
+                                     optimizer = "adam",
                                      eval.metric=mx.metric.accuracy,
                                      epoch.end.callback=mx.callback.log.train.metric(128))
 print(proc.time() - tic)
