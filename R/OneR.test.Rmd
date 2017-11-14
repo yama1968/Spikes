@@ -1,0 +1,280 @@
+---
+title: "OneR testing"
+output: html_notebook
+---
+```{r}
+
+```
+
+From: https://shiring.github.io/machine_learning/2017/04/23/one_r
+
+```{r}
+library(OneR)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+library(tidyverse)
+
+data_16 <- read.table("world-happiness/2016.csv", sep = ",", header = TRUE)
+data_15 <- read.table("world-happiness/2015.csv", sep = ",", header = TRUE)
+
+dim(data_16)
+```
+
+```{r}
+common_feats <- colnames(data_16)[which(colnames(data_16) %in% colnames(data_15))]
+
+# features and response variable for modeling
+feats <- setdiff(common_feats, c("Country", "Happiness.Rank", "Happiness.Score"))
+response <- "Happiness.Score"
+
+# combine data from 2015 and 2016
+data_15_16 <- rbind(select(data_15, one_of(c(feats, response))),
+                    select(data_16, one_of(c(feats, response))))
+dim(data_15_16)
+```
+
+```{r}
+data_15_16 %>% head
+```
+
+```{r}
+data_15_16$Happiness.Score.l <- bin(data_15_16$Happiness.Score, nbins = 3, method = "content")
+
+intervals <- paste(levels(data_15_16$Happiness.Score.l), collapse = " ")
+intervals <- gsub("\\(|]", "", intervals)
+intervals <- gsub(",", " ", intervals)
+intervals <- as.numeric(unique(strsplit(intervals, " ")[[1]]))
+
+intervals
+```
+
+```{r}
+data_15_16 %>%
+  ggplot() +
+  geom_density(aes(x = Happiness.Score), color = "blue", fill = "blue", alpha = 0.4) +
+  geom_vline(xintercept = intervals[2]) +
+  geom_vline(xintercept = intervals[3])
+```
+
+```{r}
+data_15_16 <- select(data_15_16, -Happiness.Score) %>%
+  mutate(Happiness.Score.l = 
+           plyr::revalue(Happiness.Score.l, 
+                         c("(2.83,4.79]" = "low", "(4.79,5.89]" = "medium", "(5.89,7.59]" = "high")))
+
+dim(data_15_16)
+```
+
+```{r}
+data_15_16 %>%
+  ggplot(aes(x = Region, fill = Happiness.Score.l)) +
+  geom_bar(position = "dodge", alpha = 0.7) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+        plot.margin = unit(c(0, 0, 0, 1.5), "cm")) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+```{r}
+data_15_16 %>%
+  gather(x, y, Economy..GDP.per.Capita.:Dystopia.Residual) %>%
+  ggplot(aes(x = y, fill = Happiness.Score.l)) +
+  geom_histogram(alpha = 0.7) +
+  facet_wrap(~ x, scales = "free", ncol = 4) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+```{r}
+data_15_16 <- select(data_15_16, -Region)
+dim(data_15_16)
+```
+
+## Modeling
+
+```{r}
+# configure multicore
+library(doParallel)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+
+library(caret)
+```
+
+```{r}
+set.seed(42)
+index <- createDataPartition(data_15_16$Happiness.Score.l, p = 0.7, list = FALSE)
+train_data <- data_15_16[index, ]
+test_data  <- data_15_16[-index, ]
+
+c(dim(train_data), dim(test_data))
+```
+
+```{r}
+# default method length
+data_1 <- bin(train_data, nbins = 5, method = "length")
+
+# method content
+data_2 <- bin(train_data, nbins = 5, method = "content")
+
+# method cluster
+data_3 <- bin(train_data, nbins = 3, method = "cluster")
+
+# optimal bin number logistic regression
+data_4 <- optbin(formula = Happiness.Score.l ~., data = train_data, method = "logreg")
+
+# optimal bin number information gain
+data_5 <- optbin(formula = Happiness.Score.l ~., data = train_data, method = "infogain")
+```
+
+```{r}
+for (i in 1:5) {
+  data <- get(paste0("data_", i))
+  print(model <- OneR(formula = Happiness.Score.l ~., data = data, verbose = TRUE))
+  assign(paste0("model_", i), model)
+}
+```
+
+```{r}
+for (i in 1:5) {
+  model <- get(paste0("model_", i))
+  eval_model(predict(model, test_data), test_data$Happiness.Score.l)
+}
+```
+
+```{r}
+for (i in 1:5) {
+  model <- get(paste0("model_", i))
+  pred <- data.frame(model = paste0("model_", i),
+                     sample_id = 1:nrow(test_data),
+                     predict(model, test_data, type = "prob"),
+                     actual = test_data$Happiness.Score.l)
+  pred$prediction <- colnames(pred)[3:5][apply(pred[, 3:5], 1, which.max)]
+  pred$correct <- ifelse(pred$actual == pred$prediction, "correct", "wrong")
+  pred$pred_prob <- NA
+  
+  for (j in 1:nrow(pred)) {
+    pred[j, "pred_prob"] <- max(pred[j, 3:5])
+  }
+  
+  if (i == 1) {
+    pred_df <- pred
+  } else {
+    pred_df <- rbind(pred_df, pred)
+  }
+}
+```
+
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+set.seed(42)
+fit <- rpart(Happiness.Score.l ~ .,
+             data = train_data,
+             method = "class",
+             control = rpart.control(xval = 10), 
+             parms = list(split = "information"))
+
+rpart.plot(fit, extra = 100)
+```
+
+```{r}
+pred <- data.frame(model = "rpart",
+                   sample_id = 1:nrow(test_data),
+                   predict(fit, test_data, type = "prob"),
+                   actual = test_data$Happiness.Score.l)
+pred$prediction <- colnames(pred)[3:5][apply(pred[, 3:5], 1, which.max)]
+pred$correct <- ifelse(pred$actual == pred$prediction, "correct", "wrong")
+pred$pred_prob <- NA
+
+for (j in 1:nrow(pred)) {
+  pred[j, "pred_prob"] <- max(pred[j, 3:5])
+}
+
+pred_df_final <- rbind(pred_df,
+                       pred)
+```
+
+```{r}
+set.seed(42)
+model_xgb <- caret::train(Happiness.Score.l ~ .,
+                          data = train_data,
+                          method = "xgbTree",
+                          trControl = trainControl(method = "repeatedcv", 
+                                                   number = 10, 
+                                                   repeats = 5, 
+                                                   verboseIter = FALSE))
+
+pred <- data.frame(model = "xgb",
+                   sample_id = 1:nrow(test_data),
+                   predict(model_xgb, test_data, type = "prob"),
+                   actual = test_data$Happiness.Score.l)
+pred$prediction <- colnames(pred)[3:5][apply(pred[, 3:5], 1, which.max)]
+pred$correct <- ifelse(pred$actual == pred$prediction, "correct", "wrong")
+pred$pred_prob <- NA
+
+for (j in 1:nrow(pred)) {
+  pred[j, "pred_prob"] <- max(pred[j, 3:5])
+}
+
+pred_df_final <- rbind(pred_df_final,
+                       pred)
+```
+
+
+```{r}
+set.seed(42)
+model_nn <- caret::train(Happiness.Score.l ~ .,
+                         data = train_data,
+                         method = "mlp",
+                         trControl = trainControl(method = "repeatedcv", 
+                                                  number = 10, 
+                                                  repeats = 5, 
+                                                  verboseIter = FALSE))
+
+varImp(model_nn)
+
+pred <- data.frame(model = "nn",
+                   sample_id = 1:nrow(test_data),
+                   predict(model_nn, test_data, type = "prob"),
+                   actual = test_data$Happiness.Score.l)
+pred$prediction <- colnames(pred)[3:5][apply(pred[, 3:5], 1, which.max)]
+pred$correct <- ifelse(pred$actual == pred$prediction, "correct", "wrong")
+pred$pred_prob <- NA
+
+for (j in 1:nrow(pred)) {
+  pred[j, "pred_prob"] <- max(pred[j, 3:5])
+}
+
+pred_df_final <- rbind(pred_df_final,
+                       pred)
+```
+
+```{r}
+pred_df_final %>%
+  group_by(model) %>%
+  dplyr::summarise(correct = sum(correct == "correct")) %>%
+  mutate(accuracy = correct / nrow(test_data)) %>%
+  ggplot(aes(x = model, y = accuracy, fill = model)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+```{r}
+pred_df_final %>%
+  group_by(model, prediction) %>%
+  dplyr::summarise(correct = sum(correct == "correct"),
+                   n = n()) %>%
+  mutate(accuracy = correct / n) %>%
+  ggplot(aes(x = model, y = accuracy, fill = prediction)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_brewer(palette = "Set1")
+```
+
