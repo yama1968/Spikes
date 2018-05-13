@@ -91,7 +91,7 @@ tic <- proc.time()
 model <- mx.model.FeedForward.create(lenet, X = train.array, y = train.y,
                                      ctx = device.gpu, num.round = 20, array.batch.size = 64,
                                      #learning.rate = 0.009, momentum = 0.95, wd = 0.0001,
-                                     learning.rate = 0.009, momentum = 0.95,
+                                     learning.rate = 0.01, momentum = 0.97,
                                      eval.metric = mx.metric.accuracy,
                                      epoch.end.callback = mx.callback.log.train.metric(100),
                                      eval.data = list(data = valid.array, label = valid.y))

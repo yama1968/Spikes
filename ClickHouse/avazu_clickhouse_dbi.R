@@ -68,3 +68,4 @@ SELECT hour,
 
 gph_time <- as.POSIXct(ymd(substr(gph$hour, 1, 6)) + hours(substr(gph$hour, 7, 8)))
 qplot(gph_time, clicks_per_hour, data = gph, geom = "line")
+
