@@ -19,15 +19,17 @@ def x2df(filename, df_types):
         return None
 
 
-def df2parquet(df, filename):
+def df2parquet(df, filename, compression='snappy'):
 
-    dd.to_parquet(df, filename)
+    dd.to_parquet(df, filename, compression=compression)
 
 
-def x2parquet(from_filename, to_filename, df_types = {}):
+def x2parquet(from_filename, to_filename,
+              df_types={},
+              compression='snappy'):
 
     df = x2df(from_filename, df_types)
-    df2parquet(df, to_filename)
+    df2parquet(df, to_filename, compression)
 
 
 def parse_dict(dict_string):
@@ -44,5 +46,7 @@ def parse_dict(dict_string):
 if __name__ == '__main__':
 
     client = Client(processes=False, threads_per_worker=4,
-                    n_workers=1, memory_limit='12GB')
-    x2parquet(argv[1], argv[2], parse_dict(argv[3]) if len(argv) >= 3 else {})
+                    n_workers=1, memory_limit='4GB')
+    x2parquet(argv[1], argv[2],
+              parse_dict(argv[3]) if len(argv) >= 4 else {},
+              compression=argv[4] if len(argv) >= 5 else 'None')
