@@ -1,0 +1,32 @@
+#/usr/bin/python
+
+import dask.dataframe as dd
+from dask import compute
+from sys import argv
+
+
+def x2df(filename):
+
+    if filename[-4:] == '.csv':
+        return dd.read_csv(filename)
+    elif filename[-8:] == '.parquet' or filename[-9] == '.parquet/':
+        return dd.read_parquet(filename)
+    else:
+        return None
+
+
+def df2parquet(df, filename):
+
+    dd.to_parquet(df, filename)
+
+
+def x2parquet(from_filename, to_filename):
+
+    df = x2df(from_filename)
+    df2parquet(df, to_filename)
+
+
+if __name__ == '__main__':
+
+    x2parquet(argv[1], argv[2])
+

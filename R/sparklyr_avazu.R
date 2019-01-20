@@ -5,9 +5,9 @@ library(dplyr)
 sc <- spark_connect(master = "local",
                     config = spark_config("spark.yml"))
 
-sc <- spark_connect(master = "spark://patty:7077",
-                    config = spark_config("spark.yml"),
-                    spark_home = "/home/yannick/Work/3p/spark-2.1.0-bin-hadoop2.7/")
+# sc <- spark_connect(master = "spark://patty:7077",
+#                     config = spark_config("spark.yml"),
+#                     spark_home = "/home/yannick/Work/3p/spark-2.1.0-bin-hadoop2.7/")
 
 ###
 
@@ -24,14 +24,23 @@ sc <- spark_connect(master = "spark://patty:7077",
 
 ###
 
-train.parquet = "/home/yannick/tmp/train.parquet"
-train.parquet = "c:\\home\\Datasets\\train.parquet"
+# train.parquet = "/home/yannick/tmp/train.parquet"
+train.parquet = "/home4/yannick4/tmp/train.parquet/"
+train.orc = '/home4/yannick4/tmp/train.orc'
+# train.parquet = "c:\\home\\Datasets\\train.parquet"
 
 system.time( df <- spark_read_parquet(sc,
                                       name = "train",
                                       path = train.parquet,
                                       repartition = 0,
                                       memory = FALSE) ) # Fastest setting!!!
+
+# system.time( df <- spark_read_orc(sc,
+#                                       name = "train",
+#                                       path = train.orc,
+#                                       repartition = 0,
+#                                       memory = FALSE) ) # Fastest setting!!!
+
 
 system.time(foo <- df %>% group_by(click) %>% summarise(cnt = count()) %>% collect)
 # 1.2 sec!!!
@@ -120,19 +129,19 @@ dt_per_day
 
 
 # # join01
-# 
+#
 # device_id_nb_tmp <- df %>%
 #   group_by(device_id) %>%
 #   summarise(nnb = count(), p = avg(click))
-# 
-# 
+#
+#
 # foo <- device_id_nb_tmp %>%
 #   inner_join(df, on = "device_id") %>%
 #   group_by(click) %>%
 #   summarise(cnt = count())
-# 
+#
 # foo %>% explain
-# 
+#
 # system.time( bar <- foo %>%
 #                arrange(desc(cnt)) %>%
 #                head(60) %>%
