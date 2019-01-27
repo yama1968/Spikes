@@ -23,6 +23,16 @@ system.time(count.device_ip <-
 count.device_ip %>%
   head(20)
 
+system.time(count10.device_ip <-
+              dbGetQuery(con,
+                         "select count(*)
+                            from (select device_ip, count(*) as cnt
+                                    from Train
+                                   group by device_ip
+                                   order by cnt desc)
+                            where cnt > 10
+                         "))
+
 system.time(count.8a014cbb <-
               dbGetQuery(con,"
 SELECT substring(hour, 1, 6) AS day,

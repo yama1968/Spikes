@@ -26,6 +26,7 @@ sc <- spark_connect(master = "local",
 
 # train.parquet = "/home/yannick/tmp/train.parquet"
 train.parquet = "/home4/yannick4/tmp/train.parquet/"
+train.parquet = "/home4/yannick4/tmp/train_dask.parquet/"
 train.orc = '/home4/yannick4/tmp/train.orc'
 # train.parquet = "c:\\home\\Datasets\\train.parquet"
 
