@@ -16,19 +16,21 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "apcluster", "igraph", "MonetDB.R", "RODBC", "RJDBC",
       "mixtools", "tclust",
       "Lahman", "VGAM", "RUnit",
-      "devtools", "xgboost",
+      "devtools",
       "R2jags", "pROC", "xkcd", "plotly",
-  #    "choroplethr", "choroplethrMaps", 
+      #    "choroplethr", "choroplethrMaps",
       "dummies", "rio",
       "dendextend", "rafalib",
       "gridExtra", "ergm", "DT", "pryr",
       "shinydashboard", "visNetwork", "drat",
-      "text2vec", "twitteR", "tidygraph", "lubridate", "xgboost", "party", 
+      "text2vec", "twitteR", "tidygraph", "lubridate", "xgboost", "party",
       "arules", "arulesViz",
-  "vtreat", "WVPlots")
+      "vtreat", "WVPlots", 'mlr', 'ROSE',
+      'xgboost', 'knitr', 'rmarkdown', 'PRROC', 'tidyverse',
+      'ggforce')
 
 
-p <- p[ ! p %in% installed.packages()]
+p <- p[ !p %in% installed.packages()]
 
 print(p)
 
@@ -44,7 +46,7 @@ library(devtools)
 install_github("ujjwalkarn/xda")
 
 
-i.xgboost <- function () {
+i.xgboost <- function() {
         require(devtools)
         devtools::install_github('dmlc/xgboost',subdir = 'R-package')
 }

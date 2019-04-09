@@ -1,8 +1,8 @@
 ---
 title: "R Notebook"
 output:
-  html_notebook: default
   pdf_document: default
+  html_notebook: default
   word_document: default
 ---
 
@@ -19,9 +19,10 @@ Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by press
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 ```{r}
 library(dplyr, quietly = TRUE)
+library(knitr)
 
 data(mtcars)
-head(mtcars, 4)
+kable(head(mtcars, 4))
 ```
 
 
@@ -31,7 +32,7 @@ per_cyl <- mtcars %>%
     summarise(disp.avg    = mean(cyl),
               carb.max    = max(carb))
 
-per_cyl
+kable(per_cyl)
 ```
 
 Et cela donne graphiquement pour les `r nrow(mtcars)` voitures:
