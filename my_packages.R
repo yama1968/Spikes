@@ -27,7 +27,8 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "arules", "arulesViz",
       "vtreat", "WVPlots", 'mlr', 'ROSE',
       'xgboost', 'knitr', 'rmarkdown', 'PRROC', 'tidyverse',
-      'ggforce')
+      'ggforce', 'heatmaply',
+      'C50')
 
 
 p <- p[ !p %in% installed.packages()]
@@ -35,8 +36,10 @@ p <- p[ !p %in% installed.packages()]
 print(p)
 
 install.packages(p)
+#
+devtools::install_github("holub008/xrf")
 
-# sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
+11# sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
 # sudo apt-get install jags
 # sudo apt-get install libiodbc2-dev
 #  sudo apt-get install libgsl0-dev gsl-bin libgeos-dev r-cran-rgl
