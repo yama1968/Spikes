@@ -217,13 +217,13 @@ def train(epoch):
         recon_batch, mu, logvar = model(data)
         loss = loss_function(recon_batch, data, mu, logvar)
         loss.backward()
-        train_loss += loss.data[0]
+        train_loss += loss.data.item()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader),
-                loss.data[0] / len(data)))
+                loss.data.item() / len(data)))
 
     print('====> Epoch: {} Average loss: {:.4f}'.format(
           epoch, train_loss / len(train_loader.dataset)))
@@ -237,7 +237,7 @@ def test(epoch):
             data = data.cuda()
         data = Variable(data, volatile=True)
         recon_batch, mu, logvar = model(data)
-        test_loss += loss_function(recon_batch, data, mu, logvar).data[0]
+        test_loss += loss_function(recon_batch, data, mu, logvar).data.item()
         if i == 0:
           n = min(data.size(0), 8)
           comparison = torch.cat([data[:n],

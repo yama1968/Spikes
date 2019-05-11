@@ -28,7 +28,7 @@ set.seed(55455)
 train_ix <- sample(nrow(census_income), floor(nrow(census_income) * .66))
 train <- census_income[train_ix, ]
 test <- census_income[-train_ix, ]
-mat <- model.matrix(above_50k ~ ., census_income)
+census_mat <- model.matrix(above_50k ~ ., census_income)
 train_mat <- census_mat[train_ix, ]
 test_mat <- census_mat[-train_ix, ]
 
@@ -80,7 +80,8 @@ m_xrf <- xrf(above_50k ~ .,
              prefit_xgb = xgb,
              glm_control = glm_control,
              sparse = F,
-             family = "binomial")
+             family = "binomial",
+             deoverlap = T)
 
 y_test_xrf <- predict(m_xrf, test, type = 'response', sparse = F)
 pr_xrf <- pr.curve(y_test_xrf[test$above_50k == 1], y_test_xrf[test$above_50k == 0], curve = TRUE)

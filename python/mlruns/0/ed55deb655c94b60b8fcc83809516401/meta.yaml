@@ -1,0 +1,14 @@
+artifact_uri: /home/yannick/Work/github/Spikes/python/mlruns/0/ed55deb655c94b60b8fcc83809516401/artifacts
+end_time: 1557259031260
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_uuid: ed55deb655c94b60b8fcc83809516401
+source_name: mlflow_01.py
+source_type: 4
+source_version: ed88fe209871beb9441ba3c37ad90bba69c8eda8
+start_time: 1557259031176
+status: 3
+tags: []
+user_id: yannick
