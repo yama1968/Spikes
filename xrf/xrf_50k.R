@@ -1,10 +1,11 @@
 
 library(RCurl)
 library(xrf)
+library(mgcv)
 
 # grabbing data from uci
 census_income_text <- getURL('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data')
-census_income <- read.csv(textConnection(census_income_text), header=F, stringsAsFactors = F)
+census_income <- read.csv(textConnection(census_income_text), header = F, stringsAsFactors = F)
 colnames(census_income) <- c('age', 'workclass', 'fnlwgt', 'education', 'education_num', 'marital_status',
                              'occupation', 'relationship', 'race', 'sex', 'capital_gain', 'capital_loss',
                              'hours_per_week', 'native_country', 'above_50k')
@@ -18,7 +19,7 @@ library(pre)
 library(glmnet)
 x <- library(xgboost)
 
-auc <- function (prediction, actual) {
+auc <- function(prediction, actual) {
   stopifnot(length(unique(actual)) == 2)
   stopifnot(length(prediction) == length(actual))
   mann_whit <- wilcox.test(prediction ~ actual)$statistic
@@ -51,3 +52,21 @@ auc(predict(m_pre, census_test), census_test$above_50k)
 auc(predict(m_xrf, census_test), census_test$above_50k)
 auc(predict(m_glm, newx = census_test_mat, s = 'lambda.min'), census_test$above_50k)
 auc(predict(m_xgb, newdata = census_test_mat, s = 'lambda.min'), census_test$above_50k)
+
+system.time({
+m_gam <- gam(above_50k ~ s(age) + workclass + s(fnlwgt) + education + education_num + marital_status +
+               occupation + relationship + race + sex +
+               s(capital_gain) + s(capital_loss, k = 3) + s(hours_per_week),
+             data = census_train,
+             family = 'binomial',
+             select = T,
+             method = "REML")
+})
+
+u <- par(mfrow = c(3,2))
+plot(m_gam)
+par(mfrow = u)
+
+auc(predict(m_gam, census_test), census_test$above_50k)
+
+

@@ -25,7 +25,7 @@ census_income <- census_income %>%
   )
 
 set.seed(55455)
-train_ix <- sample(nrow(census_income), floor(nrow(census_income) * .66))
+train_ix <- sample(nrow(census_income), floor(nrow(census_income) * .7))
 train <- census_income[train_ix, ]
 test <- census_income[-train_ix, ]
 census_mat <- model.matrix(above_50k ~ ., census_income)

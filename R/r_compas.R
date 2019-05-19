@@ -11,6 +11,7 @@ set.seed(42)
 inTrain <- createDataPartition(df$Recidivate.Within.Two.Years, p = 0.6, list = FALSE)
 
 train <- df[inTrain,]
+X <- train %>% select(-Recidivate.Within.Two.Years)
 test <- df[-inTrain,]
 
 y <- train$Recidivate.Within.Two.Years
