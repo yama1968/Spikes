@@ -15,14 +15,12 @@ coefs
 
 imps <- importance(airq.ens, round = 4)
 
+
+
 set.seed(42)
 airq.gpe <- gpe(Ozone ~ ., data = airquality[complete.cases(airquality),],
                 base_learners = list(gpe_trees(), gpe_linear(), gpe_earth()))
 airq.gpe
-
-
-
-
 
 
 m_gam <- gam(Ozone ~ s(Solar.R) + s(Wind) + s(Temp) + Month + Day,

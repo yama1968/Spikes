@@ -1,0 +1,86 @@
+
+library(RCurl)
+library(mgcv)
+library(PRROC)
+library(dplyr)
+library(tidyverse)
+
+
+# grabbing data from uci
+# census_income_text <- getURL('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data')
+# census_income <- read.csv(textConnection(census_income_text), header = F, stringsAsFactors = F)
+census_income <- read.csv(file = "../data/adult.data", header = F, stringsAsFactors = F)
+colnames(census_income) <- c('age', 'workclass', 'fnlwgt', 'education', 'education_num', 'marital_status',
+                             'occupation', 'relationship', 'race', 'sex', 'capital_gain', 'capital_loss',
+                             'hours_per_week', 'native_country', 'above_50k')
+
+low_card_occupations <- table(census_income$occupation) %>%
+  as.data.frame %>%
+  mutate(percent = Freq / nrow(census_income)) %>%
+  filter(percent < 0.02) %>%
+  select(Var1) %>%
+  as.list
+
+census_income <- census_income %>%
+  mutate(occupation = ifelse(occupation %in% as.character(low_card_occupations$Var1), "other", occupation)) %>%
+  mutate(above_50k = (above_50k == ' >50K'))
+
+auc <- function(prediction, actual) {
+  stopifnot(length(unique(actual)) == 2)
+  stopifnot(length(prediction) == length(actual))
+  mann_whit <- wilcox.test(prediction ~ actual)$statistic
+  unname(1 - mann_whit/(sum(actual) * as.double(sum(!actual))))
+}
+
+aucpr <- function(prediction, actual) {
+  pr.curve(prediction[actual == 1], prediction[actual == 0], curve = FALSE)$auc.integral
+}
+
+#####
+
+formula <- above_50k ~ s(age) + workclass + s(fnlwgt) + education + education_num + marital_status +
+  occupation + relationship + race + sex +
+  s(capital_gain) + s(capital_loss) + s(hours_per_week)
+# formula <- above_50k ~ age + s(capital_gain) + s(capital_loss) + hours_per_week
+
+
+#Randomly shuffle the data
+df <- census_income[sample(nrow(census_income)),]
+
+n_folds <- 5
+
+#Create 10 equally size folds
+folds <- cut(seq(1,nrow(df)), breaks = n_folds, labels = FALSE)
+
+#Perform 10 fold cross validation
+cv.r <- foreach(i = 1:n_folds, .combine = rbind) %do% {
+  #Segment your data by fold using the which() function
+  testIndexes <- which(folds == i, arr.ind = TRUE)
+  testData <- df[testIndexes, ]
+  trainData <- df[-testIndexes, ]
+  #Use the test and train data partitions however you desire...
+
+  timing <- system.time({
+    m_gam <- gam(formula,
+                 data = trainData,
+                 family = 'binomial',
+                 select = T,
+                 method = "REML")
+  })
+
+  y_hat <- as.vector(predict(m_gam, testData))
+  roc <- auc(y_hat, testData$above_50k)
+  pr <- aucpr(y_hat, testData$above_50k)
+  elapsed <- timing[["elapsed"]]
+
+  print(paste("fold", i, "roc / pr", roc, "/", pr, "elapsed", elapsed))
+  c(roc, pr, elapsed)
+} %>% as.data.frame
+names(cv.r) <- c("roc", "pr", "elapsed")
+
+print(paste("pr avg =", mean(cv.r$pr), "std = ", sd(cv.r$pr)))
+
+plot(m_gam, pages = 1,
+     rug = TRUE, residuals = TRUE,
+     pch = 1, cex = 1,
+     shade = T)

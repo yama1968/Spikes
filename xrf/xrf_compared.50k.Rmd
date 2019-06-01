@@ -1,0 +1,117 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(RCurl)
+library(xrf)
+library(mgcv)
+library(PRROC)
+library(dplyr)
+library(pre)
+library(glmnet)
+library(tidyverse)
+x <- library(xgboost)
+
+# grabbing data from uci
+# census_income_text <- getURL('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data')
+# census_income <- read.csv(textConnection(census_income_text), header = F, stringsAsFactors = F)
+census_income <- read.csv(file = "../data/adult.data", header = F, stringsAsFactors = F)
+colnames(census_income) <- c('age', 'workclass', 'fnlwgt', 'education', 'education_num', 'marital_status',
+                             'occupation', 'relationship', 'race', 'sex', 'capital_gain', 'capital_loss',
+                             'hours_per_week', 'native_country', 'above_50k')
+
+low_card_occupations <- table(census_income$occupation) %>% 
+  as.data.frame %>% 
+  mutate(percent = Freq / nrow(census_income)) %>% 
+  filter(percent < 0.02) %>% 
+  select(Var1) %>% 
+  as.list
+
+census_income <- census_income %>%
+  mutate(occupation = ifelse(occupation %in% as.character(low_card_occupations$Var1), "other", occupation))
+
+auc <- function(prediction, actual) {
+  stopifnot(length(unique(actual)) == 2)
+  stopifnot(length(prediction) == length(actual))
+  mann_whit <- wilcox.test(prediction ~ actual)$statistic
+  unname(1 - mann_whit/(sum(actual) * as.double(sum(!actual))))
+}
+
+aucpr <- function(prediction, actual) {
+  pr.curve(prediction[actual == 1], prediction[actual == 0], curve = FALSE)$auc.integral
+}
+
+census_income <- census_income %>%
+  # pre is picky about data types
+  mutate_if(is.character, as.factor) %>%
+  mutate(
+    above_50k = as.character(above_50k) == ' >50K'
+  )
+
+
+set.seed(55455)
+train_ix <- sample(nrow(census_income), floor(nrow(census_income) * .66))
+census_train <- census_income[train_ix, ]
+census_test <- census_income[-train_ix, ]
+census_mat <- model.matrix(above_50k ~ ., census_income)
+census_train_mat <- census_mat[train_ix, ]
+census_test_mat <- census_mat[-train_ix, ]
+
+system.time(m_pre <- pre(above_50k ~ ., na.omit(census_train),
+                         family = 'binomial', ntrees = 100, maxdepth = 3, tree.unbiased = TRUE))
+system.time(m_xrf <- xrf(above_50k ~ ., census_train, family = 'binomial',
+                         xgb_control = list(nrounds = 100, max_depth = 3),
+                         glm_control = list(type.measure = "auc",
+                                            pmax = 80,
+                                            parallel = T,
+                                            nfolds = 3),
+                         deoverlap = TRUE))
+m_xgb <- xgboost(census_train_mat, census_train$above_50k, max_depth = 3, nrounds = 100, objective = 'binary:logistic')
+m_glm <- cv.glmnet(census_train_mat, census_train$above_50k, alpha = 1)
+
+system.time({
+m_gam <- gam(above_50k ~ s(age) + workclass + s(fnlwgt) + education + education_num + marital_status +
+               occupation + relationship + race + sex +
+               s(capital_gain) + s(capital_loss) + s(hours_per_week),
+             data = census_train,
+             family = 'binomial',
+             select = T,
+             method = "REML")
+})
+
+r <- data.frame(
+  method = c("pre", "xrf", "glm", "xgb", "gam"),
+  aucpr = c(
+    aucpr(predict(m_pre, census_test), census_test$above_50k),
+    aucpr(predict(m_xrf, census_test), census_test$above_50k),
+    aucpr(predict(m_glm, newx = census_test_mat, s = 'lambda.min'), census_test$above_50k),
+    aucpr(predict(m_xgb, newdata = census_test_mat, s = 'lambda.min'), census_test$above_50k),
+    aucpr(as.vector(predict(m_gam, census_test)), census_test$above_50k))
+)
+  
+r %>% arrange(desc(aucpr))
+```
+
+```{r}
+library(gamclass)
+
+census_train$Class <- as.factor(census_train$Class)
+
+system.time(
+  cv.gam <- CVgam(formula = above_50k ~ 
+                    s(age) + workclass + s(fnlwgt) + education + education_num + marital_status +
+                    occupation + relationship + race + sex +
+                    s(capital_gain) + s(capital_loss) + s(hours_per_week),
+                  data = census_train,
+                  method = "REML",
+                  nfold = 5,
+                  debug.level = 2,
+                  seed = 42,
+                  printit = T)
+)
+```
+
