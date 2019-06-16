@@ -28,7 +28,7 @@ p = c("caret", "e1071", "rjags", "dclone", "data.table", "dplyr",
       "vtreat", "WVPlots", 'mlr', 'ROSE',
       'xgboost', 'knitr', 'rmarkdown', 'PRROC', 'tidyverse',
       'ggforce', 'heatmaply',
-      'C50')
+      'C50', 'gratia', 'mgcViz')
 
 
 p <- p[ !p %in% installed.packages()]
