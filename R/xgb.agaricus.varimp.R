@@ -16,7 +16,7 @@ dtest  <- xgb.DMatrix(data   = test$data,
 watchlist <- list(train = dtrain,
                   test  = dtest)
 
-params <- list(max.depth = 5,
+params <- list(max.depth = 1,
                eta = 1, 
                nthread = 2, 
                nround = 2,
@@ -33,6 +33,7 @@ bst <- xgb.train(data         = dtrain,
 # train$data@Dimnames[[2]] represents the column names of the sparse matrix.
 xgb.importance(train$data@Dimnames[[2]], model = bst)
 
+
 # Same thing with co-occurence computation this time
 importanceRaw <- xgb.importance(train$data@Dimnames[[2]], model = bst, data = train$data, label = train$label)
 importanceClean <- importanceRaw[,`:=`(Cover=NULL, Frequency=NULL)]
@@ -46,3 +47,18 @@ pred.breakdown <- explainPredictions(bst, explainer, dtest)
 
 showWaterfall(bst, explainer, dtest, test$data, 2, type = "binary")
 showWaterfall(bst, explainer, dtest, test$data, 98, type = "binary")
+
+params$max.depth = 3
+
+new <- xgb.train(data         = dtrain, 
+                 xgb_model    = bst,
+                 params       = params,
+                 watchlist    = watchlist,
+                 eval.metric  = "auc",
+                 nrounds      = 4)
+
+xgb.importance(train$data@Dimnames[[2]], model = new)
+
+importanceRaw <- xgb.importance(train$data@Dimnames[[2]], model = new, data = train$data, label = train$label)
+importanceClean <- importanceRaw[,`:=`(Cover=NULL, Frequency=NULL)]
+as.data.frame(importanceClean)
