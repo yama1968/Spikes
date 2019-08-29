@@ -113,3 +113,4 @@ print(paste("roc xrf =", roc_xrf$auc))
 
 coefs_xrf <- coef(m_xrf) %>% filter(coefficient_lambda.min != 0)
 coefs_xrf %>% View
+
