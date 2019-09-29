@@ -31,19 +31,19 @@ auprcSummary <- function(data, lev = NULL, model = NULL){
 
 }
 
-# Re-initialize control function to remove smote and
-# include our new summary function
 
 ctrl <- trainControl(method = "repeatedcv",
                      number = 2,
                      repeats = 5,
                      summaryFunction = auprcSummary,
-                     classProbs = TRUE)
+                     classProbs = TRUE,
+                     search = "random",
+                     verboseIter = TRUE)
 
 orig_pr <- train(Class ~ .,
                  data = imbal_train,
                  method = "gbm",
-                 verbose = FALSE,
+                 verbose = F,
                  metric = "AUCPR",
                  trControl = ctrl)
 
