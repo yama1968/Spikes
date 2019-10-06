@@ -2,8 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import tensorflow as tf
 
-##
-
 import numpy as np
 import pandas as pd
 
@@ -43,15 +41,15 @@ raw = None
 
 training_generator = BalancedBatchGenerator(x_train, y_train,
                                             sampler=RandomOverSampler(sampling_strategy=1.),
-                                            batch_size=128,
+                                            batch_size=2048,
                                             random_state=42)
 
 
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Dense(x_train.shape[1], activation='relu'),
-  tf.keras.layers.Dropout(0.5),
-  tf.keras.layers.Dense(15, activation='relu'),
-  tf.keras.layers.Dropout(0.5),
+  tf.keras.layers.Dense(256, input_shape=(x_train.shape[-1],), activation='relu'),
+  tf.keras.layers.Dropout(0.3),
+  tf.keras.layers.Dense(256, activation='relu'),
+  tf.keras.layers.Dropout(0.3),
   tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -61,17 +59,17 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 def aucpr(y_true, y_pred):
     return tf.py_function(average_precision_score, (y_true, y_pred), tf.double)
 
-class_weight = {0: 1., 1: 10.}
+class_weight = {0: 1., 1: 1/y_train.mean()} # shall we use them?
 
 
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy', aucpr])
 
-model.fit_generator(training_generator, epochs=20)
+model.fit(x_train, y_train, epochs=7)
+# model.fit_generator(training_generator, epochs=7)
+model.evaluate(x_test, y_test, verbose=4)
 
-model.evaluate(x_test,  y_test, verbose=4)
 
 y_hat = model.predict_proba(x_test)
-
 print("test score = %.3f" % average_precision_score(y_test, y_hat))

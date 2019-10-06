@@ -44,12 +44,12 @@ weights = np.array([1, y_mean], dtype=np.float32)
 
 #%%
 class MyModule(nn.Module):
-    def __init__(self, num_units=10, nonlin=F.relu, input_size=X.shape[1]):
+    def __init__(self, num_units=10, nonlin=F.relu, input_size=X.shape[1], dropout=0.4):
         super(MyModule, self).__init__()
 
         self.dense0 = nn.Linear(input_size, num_units)
         self.nonlin = nonlin
-        self.dropout1 = nn.Dropout(0.5)
+        self.dropout1 = nn.Dropout(dropout)
         self.dense1 = nn.Linear(num_units, 10)
         self.output = nn.Linear(10, 2)
 
@@ -79,7 +79,9 @@ net = NeuralNetClassifier(
 params = {
     'lr': [0.3, 0.1, 0.03, 0.01, 0.003, 0.001],
     'max_epochs': [5, 10, 20],
-    'module__num_units': [10, 20, 40],
+    'module__num_units': [16, 32, 64, 128, 256, 512],
+    'module__dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
+    'batch_size': [1024, 2048, 4096]
 }
 #%%
 random.seed(2)
@@ -93,7 +95,7 @@ cv = EvolutionaryAlgorithmSearchCV(estimator            = net,
                                    gene_mutation_prob   = 0.25,
                                    gene_crossover_prob  = 0.5,
                                    tournament_size      = 4,
-                                   generations_number   = 6,
+                                   generations_number   = 4,
                                    n_jobs               = 1,
                                    refit                = False)
 
