@@ -1,0 +1,2 @@
+"name";"dataset";"n_folds";"pr.mean";"pr.std";"roc.mean";"roc.std";"elapsed.mean";"elapsed.sd"
+"xrf_20_multi3";"heloc";5;0.767609992392318;0.00964253446033504;0.772175977948114;0.0108342547172846;11.2712;0.371956583487888

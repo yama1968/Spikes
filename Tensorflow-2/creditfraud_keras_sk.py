@@ -33,13 +33,8 @@ raw.describe().T
 X = np.array(raw[["Amount", "Time"] + ["V%d" % i for i in range(1, 29)]])
 y = np.array(raw.Class)
 
-# X = np.array(raw[["Amount", "Time"] + ["V%d" % i for i in range(1, 29)]]).astype(np.float32)
-# y = np.array(raw.Class.astype(np.int64))
-
-
 scaler = StandardScaler()
 
-# X = scaler.fit_transform(X).astype(np.float32)
 X = scaler.fit_transform(X)
 
 print("loaded %s and got %s from %s" % (data_file, str((X.shape, y.shape)), raw.shape))
@@ -61,7 +56,7 @@ def aucpr(y_true, y_pred):
 def build_model(n_first=512, n_second=256, 
                 dropout_first=0., dropout_second=0.4,
                 add_layers=2,
-                learning_rate=0.001):
+                learning_rate=0.001, epsilon=1e-8):
   
   layers = ([tf.keras.layers.Dense(n_first, activation='relu')] +
             ([tf.keras.layers.Dropout(dropout_first)] if dropout_first > 0 else []) +
@@ -72,6 +67,7 @@ def build_model(n_first=512, n_second=256,
   model = tf.keras.models.Sequential(layers)
   model.compile(optimizer='adam',
                 learning_rate=learning_rate,
+                epsilon=epsilon,
                 loss='binary_crossentropy',
                 metrics=['AUC'])
   return model
@@ -97,6 +93,7 @@ params = {
     'add_layers': range(4),
     'batch_size': [1024, 2048, 4096, 8192],
     'learning_rate': 1E-6 * 10 ** (np.arange(8) / 2.),
+    'epsilon': 10. ** -np.arange(7, 10)
 }
 #%%
 random.seed(2)
@@ -106,13 +103,13 @@ clf = KerasClassifier(build_fn=build_model, verbose=0, validation_split=0.)
 cv = EvolutionaryAlgorithmSearchCV(estimator            = clf,
                                    params               = params,
                                    scoring              = 'average_precision',
-                                   cv                   = StratifiedKFold(n_splits=3),
+                                   cv                   = StratifiedKFold(n_splits=5),
                                    verbose              = 1,
-                                   population_size      = 20,
+                                   population_size      = 40,
                                    gene_mutation_prob   = 0.25,
                                    gene_crossover_prob  = 0.5,
                                    tournament_size      = 4,
-                                   generations_number   = 6,
+                                   generations_number   = 10,
                                    n_jobs               = 1,
                                    refit                = False)
 
