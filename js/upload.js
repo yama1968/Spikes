@@ -2,6 +2,8 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
+
 
 const storage = multer.diskStorage({
     destination: "/tmp",
@@ -22,6 +24,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 // const morgan = require('morgan');
 
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -37,6 +40,7 @@ app.post('/', upload.single('avatar'), (req, res) => {
         return res.send({success: true});
     }
 });
+
 
 // app.use(express.static(__dirname, 'public'));
 
