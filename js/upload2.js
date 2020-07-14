@@ -28,6 +28,7 @@ app.get('/', (req, res) => {
 app.post('/image', (req, res) => {
     upload.single("img")(req, res, (err) => {
         if(err) {
+            console.log(`Error ${err}`);
             res.status(400).send(`Something went wrong! ${err}\n`);
         } else {
             console.log(`Got one, going to ${req.file.path}`);
