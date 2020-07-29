@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My header</title>
+
+        <!-- dev version, according to https://vuejs.org/v2/guide/ -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+
+    <body>
+        <script type="text/javascript">
+            function sayHi(personName) {
+                return `Hi, ${personName}`;
+            }
+        </script>
+    
+        Hello World!
+
+        <div id="app">
+            {{message}}
+        </div>
+
+        <script type="text/javascript">
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    message: sayHi("Franckie")
+                }
+            })
+        </script>
+
+        <div id="app-2">
+            <span v-bind:title="message">
+                Hover your mouse over me for a few seconds
+                to see my dynamically bound title!
+            </span>
+        </div>
+
+        <script>
+            var app2 = new Vue({
+                el: '#app-2',
+                data: {
+                    message: 'You really load this page on ' + new Date().toLocaleDateString()
+                }
+            })
+        </script>
+
+        <div id="app-3">
+            <span v-if="seen">Now you see me</span>
+        </div>
+        <script type="text/javascript">
+            var app3 = new Vue({
+                el: '#app-3',
+                data: { seen: true }
+            })
+        </script>
+
+        <div id="app-4">
+            <ol>
+                <li v-for="todo in todos">
+                    {{ todo.text }}
+                </li>
+            </ol>
+        </div>
+        <script>
+            var app4 = new Vue({
+                el: '#app-4',
+                data: { todos: [ 
+                    { text: 'Learn JavaScript' }, 
+                    { text: 'Learn Vue' }, 
+                    { text: 'Learn nothing' }
+                ]}
+            })
+        </script>
+
+        <!-- Handling user input -->
+        <div id="app-5">
+            <p>{{ message }}</p>
+            <button v-on:click="reverseMessage">Reverse Message</button>
+        </div>
+        <script>
+            var app5 = new Vue({
+                el: "#app-5",
+                data: { message: 'Hello Vue.js !' },
+                methods: {
+                    reverseMessage: function() {
+                        this.message = this.message.split('').reverse().join("");
+                        app3.seen = ! app3.seen;
+                    }
+                }
+            })
+        </script>
+
+        <!-- Two way binding -->
+        <div id='app-6'>
+            <p>{{ message }}</p>
+            <input v-model="message">
+        </div>
+        <script>
+            var app6 = new Vue({
+                el: '#app-6',
+                data: { message: 'Hello Vue!'}
+            })
+        </script>
+    </body>
+</html>
