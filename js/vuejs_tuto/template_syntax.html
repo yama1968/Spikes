@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My header</title>
+
+        <!-- dev version, according to https://vuejs.org/v2/guide/ -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+
+    <body>
+        <div id='ex1'>
+            <p>Using mustaches: {{ rawHtml }}</p>
+            <p>Using v-html directive: <span v-html="rawHtml"></span></p>    
+        </div>
+
+        <script>
+            var app1 = new Vue({
+                el: '#ex1',
+                data: function() { return { rawHtml: '<span style="color: red">This should be red.</span>' } }
+            })
+        </script>
+
+        <!-- Hide and see -->
+        <div id='ex2'>
+            <p v-if="seen">Now you see me at {{ now }}.</p>
+            <button @click="toggle">{{ message }}</button>
+        </div>
+        <script>
+            var app2 = new Vue({
+                el: '#ex2',
+                data: { message: "Hide", seen: true, eventName: 'click' },
+                computed: { 
+                    now: function() { return Date.now() },
+                },
+                methods: { 
+                    toggle: function() {
+                        if(this.seen) {
+                            this.seen = false;
+                            this.message = "Show";
+                            this.eventName = 'click'
+                        } else {
+                            this.seen = true;
+                            this.message = "Hide";
+                            this.eventName = 'click';
+                        }
+                    }
+                }
+            })
+        </script>
+
+        <!-- computed property -->
+        <div id='ex3'>
+            <p>{{ fullName }}</p>
+            <input v-model="firstName">
+            <input v-model="lastName">
+        </div>
+        <script>
+            var app3 = new Vue({
+                el: '#ex3',
+                data: {
+                    firstName: 'Foo',
+                    lastName: 'Bar'
+                },
+                computed: {
+                    fullName: function () {
+                        return this.firstName + ' ' + this.lastName;
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
