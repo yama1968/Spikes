@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My header Bonjour Auriane</title>
+</head>
+
+<body>
+    <!-- dev version, according to https://vuejs.org/v2/guide/ -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <p>Hello World!</p>
+    <p> Laetitia</p>
+    <script>
+        x = 1 + 1
+            // alert("Bonjour Laetitia, x = " + x)
+    </script>
+
+    <ul id="ex1">
+        <li v-for="item in sorted_items" :key="item.message">
+            {{ item.message }}
+        </li>
+    </ul>
+
+    <script>
+        var ex1 = new Vue({
+            el: '#ex1',
+            data: {
+                items: [
+                    { message: "Foo" },
+                    { message: "Bar" }
+                ]
+            },
+            computed: {
+                sorted_items: function () {
+                    const items_clone = this.items.map(x => x)
+                    items_clone.sort((a,b) => a.message >= b.message)
+                    return items_clone
+                }
+            }
+        })
+        function add_one(buz) {
+            ex1.items.push({ message: buz })
+        }
+        function remove_one() {
+            ex1.items.pop()
+        }
+    </script>
+
+    <ul id="ex2">
+        <p><input v-model="buz"></p>
+        <p><button v-on:click="push">Push</button>
+            <button v-on:click="pop">Pop</button></p>
+    </ul>
+
+    <script>
+        var ex2 = new Vue({
+            el: '#ex2',
+            data: {
+                buz: "Buz"
+            },
+            methods: {
+                push: function (mouseEvent) { add_one(this.buz) },
+                pop: function (mouseEvent) { remove_one() }
+            }
+        })
+    </script>
+
+    <ul id="ex3">
+        <p>{{ message }}</p>
+        <button v-on:click="onClick">Press me</button>
+        <button v-on:click.exact="onClick" v-on:click.ctrl="onCtrlClick" v-on:click.shift="onShiftClick">Press me</button>
+    </ul>
+
+    <script>
+        var ex3 = new Vue({
+            el: '#ex3',
+            data: {
+                message: "Nothing pressed so far"
+            },
+            methods: {
+                onClick: function() { this.message = "Click" },
+                onCtrlClick: function() { this.message = "Control Click" },
+                onShiftClick: function() { this.message = "Shift Click" }
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Interactive Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css">
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+    <div id="app" class="container">
+        <!-- The rest of the app goes here -->
+
+        <div class="row">
+
+            <div class="col-md-9">
+                <!-- The map goes here -->
+                <div id="map" class="map"></div>
+                <p>Hello</p>
+            </div>
+
+            <div class="col-md-3">
+                <!-- The layer checkboses go here -->
+                <div class="form-check" v-for="layer in layers" :key="layer.id">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" v-model="layer.active"
+                            @change="layerChanged(layer.id, layer.active)" />
+                        {{ layer.name }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
