@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My header</title>
+
+    <!-- dev version, according to https://vuejs.org/v2/guide/ -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+
+</body>
+<div id="app-msg">
+    <span v-html="message"></span>
+</div>
+
+<div id="app-input">
+    <input v-model="inputMessage">
+    <button v-on:click="validateInput">Validate</button>
+</div>
+
+<script>
+    const appMsg = new Vue({
+        el: "#app-msg",
+
+        data: {
+            input: "nothing"
+        },
+
+        computed: {
+            message: function () {
+                return `<h3>${this.input}</h3>`;
+            }
+        }
+    });
+
+    const appInput = new Vue({
+        el: "#app-input",
+
+        data: {
+            inputMessage: "Not much",
+        },
+
+        methods: {
+            validateInput: function () {
+                appMsg.input = this.inputMessage;
+            }
+        }
+    })
+</script>
+
+</html>
