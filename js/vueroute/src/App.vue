@@ -2,22 +2,17 @@
   <div id="app">
     <nav>
       <router-link to="/">Home</router-link>
-      <router-link to="/register">Register</router-link>
+      <router-link to="/register1">Register premier</router-link>
+      <router-link to="/register2">Register deuxième</router-link>
       <router-link to="/login">Login</router-link>
     </nav>
-    <p>Just showing x = {{ x }}</p>
     <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'foobarbuz',
-  data () {
-    return ({
-      x: 10,
-    })
-  },
+
 }
 </script>
 
